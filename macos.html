@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Module 2: macOS | OS Explorer</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site">
+    <div class="bar">
+      <a class="brand" href="index.html">OS Explorer</a>
+      <nav aria-label="Main">
+        <a href="index.html">Home</a>
+        <a href="windows.html">Windows</a>
+        <a href="macos.html" aria-current="page">macOS</a>
+        <span class="soon">Linux (coming soon)</span>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="hero">
+      <h1>Module 2: macOS</h1>
+      <p>macOS is Apple's operating system for Mac computers. It is built on a Unix foundation and designed to run only on Apple hardware, which lets Apple tune the software and the machine together.</p>
+    </div>
+
+    <section id="interface">
+      <h2>The macOS interface</h2>
+      <p>Select a part of the desktop to see what it does.</p>
+      <div class="tabs" role="tablist" aria-label="Interface parts">
+        <button class="tab" role="tab" aria-selected="true" aria-controls="i1" id="ti1">Menu bar</button>
+        <button class="tab" role="tab" aria-selected="false" aria-controls="i2" id="ti2">Dock</button>
+        <button class="tab" role="tab" aria-selected="false" aria-controls="i3" id="ti3">Finder</button>
+        <button class="tab" role="tab" aria-selected="false" aria-controls="i4" id="ti4">Spotlight</button>
+        <button class="tab" role="tab" aria-selected="false" aria-controls="i5" id="ti5">Mission Control</button>
+      </div>
+      <div class="card panel" role="tabpanel" id="i1" aria-labelledby="ti1"><p>The bar across the top of the screen always shows the menus for the app you are using, plus the clock, Wi-Fi, battery, and Control Center. Unlike Windows, menus live at the top of the screen, not inside each window.</p></div>
+      <div class="card panel" role="tabpanel" id="i2" aria-labelledby="ti2" hidden><p>The Dock holds your favorite apps and shows which apps are running. Click an icon to open the app, and drag icons to rearrange them.</p></div>
+      <div class="card panel" role="tabpanel" id="i3" aria-labelledby="ti3" hidden><p>Finder is the file manager and the first app that opens when you log in. It shows files in icon, list, column, or gallery view.</p></div>
+      <div class="card panel" role="tabpanel" id="i4" aria-labelledby="ti4" hidden><p>Press <code>Cmd+Space</code> to search files, launch apps, do quick math, and look up definitions from one box.</p></div>
+      <div class="card panel" role="tabpanel" id="i5" aria-labelledby="ti5" hidden><p>Mission Control shows every open window and your virtual desktops (Spaces) at once, so you can organize work across multiple screens. Open it with a three or four finger swipe up on the trackpad.</p></div>
+    </section>
+
+    <section id="hardware">
+      <h2>Apple hardware integration</h2>
+      <div class="grid">
+        <div class="card"><h3>Apple silicon</h3><p>Modern Macs use Apple's own M-series chips. The CPU, GPU, and Neural Engine sit on one chip, which gives strong performance with low power use and long battery life.</p></div>
+        <div class="card"><h3>Unified memory</h3><p>The CPU and GPU share one pool of memory, so data does not need to be copied between them.</p></div>
+        <div class="card"><h3>Secure Enclave and Touch ID</h3><p>A dedicated security chip stores fingerprint data and encryption keys, and lets you sign in or pay with a touch.</p></div>
+        <div class="card"><h3>Continuity</h3><p>Handoff, AirDrop, Universal Clipboard, and Sidecar let a Mac, iPhone, iPad, and Apple Watch work together. You can start an email on one device and finish it on another.</p></div>
+        <div class="card"><h3>iCloud</h3><p>Syncs files, photos, passwords, notes, and settings across your Apple devices.</p></div>
+        <div class="card"><h3>Display and ports</h3><p>Retina displays, Thunderbolt ports, and a high-quality trackpad are standard across the lineup.</p></div>
+      </div>
+    </section>
+
+    <section id="software">
+      <h2>Software ecosystem</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Category</th><th>Examples</th></tr></thead>
+          <tbody>
+            <tr><td>Included apps</td><td>Safari, Mail, Messages, Photos, Notes, Pages, Numbers, Keynote</td></tr>
+            <tr><td>Creative pro</td><td>Final Cut Pro, Logic Pro, Adobe Creative Cloud</td></tr>
+            <tr><td>Development</td><td>Xcode (required for iOS and macOS apps), Terminal, VS Code, Homebrew</td></tr>
+            <tr><td>Productivity</td><td>Microsoft Office, Slack, Zoom</td></tr>
+            <tr><td>App sources</td><td>Mac App Store, or direct downloads from developers</td></tr>
+            <tr><td>Compatibility</td><td>Rosetta 2 runs older Intel apps on Apple silicon Macs</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="margin-top:12px">macOS uses the APFS file system, which is optimized for flash storage and supports snapshots and encryption. Time Machine provides automatic backups.</p>
+    </section>
+
+    <section id="security">
+      <h2>Security</h2>
+      <div class="grid">
+        <div class="card"><h3>Gatekeeper</h3><p>Checks that downloaded apps come from identified developers and have been notarized by Apple.</p></div>
+        <div class="card"><h3>XProtect</h3><p>Built-in malware detection that Apple updates in the background.</p></div>
+        <div class="card"><h3>FileVault</h3><p>Encrypts the entire startup disk so the data is unreadable without your login.</p></div>
+        <div class="card"><h3>System Integrity Protection</h3><p>Stops even administrators from changing protected system files.</p></div>
+        <div class="card"><h3>App sandboxing and permissions</h3><p>Apps must ask before using your camera, microphone, location, or files in protected folders.</p></div>
+        <div class="card"><h3>Keychain</h3><p>Stores passwords and certificates securely and fills them in for you.</p></div>
+      </div>
+    </section>
+
+    <section id="limits">
+      <h2>Advantages and limitations</h2>
+      <div class="grid">
+        <div class="card pros">
+          <h3>Strengths</h3>
+          <ul class="clean">
+            <li>Smooth, consistent experience across hardware and software</li>
+            <li>Strong default security and privacy settings</li>
+            <li>Excellent for creative work and development</li>
+            <li>Long software support and good resale value</li>
+          </ul>
+        </div>
+        <div class="card cons">
+          <h3>Limitations</h3>
+          <ul class="clean">
+            <li>Only runs on Apple hardware, which is expensive</li>
+            <li>Little or no hardware upgradeability, and repairs can be costly</li>
+            <li>Fewer games than Windows</li>
+            <li>Ecosystem lock-in makes switching away harder</li>
+            <li>Older Macs eventually stop receiving new macOS versions</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="quiz">
+      <h2>Quick check</h2>
+      <div class="card">
+        <h3 id="quizQ"></h3>
+        <div id="quizOpts"></div>
+        <p id="quizResult" aria-live="polite"></p>
+        <p style="margin-top:12px"><button class="btn" id="quizNext" type="button">Next question</button></p>
+      </div>
+    </section>
+  </main>
+
+  <footer>Interactive Operating Systems Explorer &middot; Chapter 8</footer>
+  <script>
+    document.querySelectorAll('.tabs').forEach(function (list) {
+      var tabs = list.querySelectorAll('.tab');
+      tabs.forEach(function (tab) {
+        tab.addEventListener('click', function () {
+          tabs.forEach(function (t) {
+            var on = t === tab;
+            t.setAttribute('aria-selected', on ? 'true' : 'false');
+            document.getElementById(t.getAttribute('aria-controls')).hidden = !on;
+          });
+        });
+      });
+    });
+
+    var questions = [
+      { q: 'Which feature checks that downloaded apps are notarized?', o: ['FileVault', 'Gatekeeper', 'Time Machine', 'Spotlight'], a: 1 },
+      { q: 'What is the default macOS file system?', o: ['NTFS', 'ext4', 'APFS', 'FAT32'], a: 2 },
+      { q: 'Which shortcut opens Spotlight?', o: ['Cmd+Space', 'Ctrl+Alt+Del', 'Cmd+Tab', 'Win+E'], a: 0 },
+      { q: 'What does Rosetta 2 do?', o: ['Encrypts the disk', 'Backs up files', 'Runs Intel apps on Apple silicon', 'Syncs with iCloud'], a: 2 }
+    ];
+    var i = 0;
+    var qEl = document.getElementById('quizQ');
+    var opts = document.getElementById('quizOpts');
+    var result = document.getElementById('quizResult');
+    function showQuestion() {
+      var item = questions[i];
+      qEl.textContent = item.q;
+      result.textContent = '';
+      opts.innerHTML = '';
+      item.o.forEach(function (text, idx) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'quiz-opt';
+        b.textContent = text;
+        b.addEventListener('click', function () {
+          var all = opts.querySelectorAll('.quiz-opt');
+          all.forEach(function (x) { x.disabled = true; });
+          all[item.a].classList.add('right');
+          if (idx === item.a) { result.textContent = 'Correct.'; }
+          else { b.classList.add('wrong'); result.textContent = 'Not quite. The right answer is highlighted.'; }
+        });
+        opts.appendChild(b);
+      });
+    }
+    document.getElementById('quizNext').addEventListener('click', function () {
+      i = (i + 1) % questions.length;
+      showQuestion();
+    });
+    showQuestion();
+  </script>
+</body>
+</html>
