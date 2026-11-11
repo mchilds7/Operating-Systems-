@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Module 1: Windows | OS Explorer</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site">
+    <div class="bar">
+      <a class="brand" href="index.html">OS Explorer</a>
+      <nav aria-label="Main">
+        <a href="index.html">Home</a>
+        <a href="windows.html" aria-current="page">Windows</a>
+        <span class="soon">macOS (coming soon)</span>
+        <span class="soon">Linux (coming soon)</span>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="hero">
+      <h1>Module 1: Windows</h1>
+      <p>Windows is Microsoft's operating system and the most widely used desktop OS in the world. First released in 1985, it runs on PCs, laptops, tablets, and servers.</p>
+    </div>
+
+    <section id="features">
+      <h2>Key features</h2>
+      <div class="grid">
+        <div class="card"><h3>Graphical interface</h3><p>The desktop, Start menu, taskbar, and windows let you work with a mouse, keyboard, or touch.</p></div>
+        <div class="card"><h3>Multitasking</h3><p>Run many programs at once and switch between them with Alt+Tab or Snap layouts.</p></div>
+        <div class="card"><h3>Hardware support</h3><p>Plug-and-play drivers work with a huge range of printers, GPUs, and other devices.</p></div>
+        <div class="card"><h3>Backward compatibility</h3><p>Many older programs still run on current versions of Windows.</p></div>
+        <div class="card"><h3>Built-in tools</h3><p>Task Manager, Settings, File Explorer, Windows Update, and PowerShell come included.</p></div>
+        <div class="card"><h3>Gaming</h3><p>DirectX and wide GPU support make Windows the leading PC gaming platform.</p></div>
+      </div>
+    </section>
+
+    <section id="proscons">
+      <h2>Advantages and disadvantages</h2>
+      <div class="grid">
+        <div class="card pros">
+          <h3>Advantages</h3>
+          <ul class="clean">
+            <li>Largest software library, including most games and business apps</li>
+            <li>Works on hardware from many manufacturers at many price points</li>
+            <li>Familiar interface that is easy for beginners</li>
+            <li>Strong support in schools and workplaces</li>
+          </ul>
+        </div>
+        <div class="card cons">
+          <h3>Disadvantages</h3>
+          <ul class="clean">
+            <li>Most targeted OS for malware because of its popularity</li>
+            <li>Can slow down over time without maintenance</li>
+            <li>Updates can restart the PC at inconvenient times</li>
+            <li>Licensed software, so it is not free like most Linux distributions</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="apps">
+      <h2>Common applications</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Category</th><th>Examples</th></tr></thead>
+          <tbody>
+            <tr><td>Productivity</td><td>Microsoft Office (Word, Excel, PowerPoint), Notepad</td></tr>
+            <tr><td>Web browsing</td><td>Microsoft Edge, Google Chrome, Firefox</td></tr>
+            <tr><td>Creative</td><td>Adobe Photoshop, Premiere Pro, Paint</td></tr>
+            <tr><td>Gaming</td><td>Steam, Xbox app, Epic Games Launcher</td></tr>
+            <tr><td>Development</td><td>Visual Studio, VS Code, Windows Terminal</td></tr>
+            <tr><td>Communication</td><td>Teams, Zoom, Outlook</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="files">
+      <h2>File management</h2>
+      <p>Windows organizes data in files and folders. Pick a topic below.</p>
+      <div class="tabs" role="tablist" aria-label="File management topics">
+        <button class="tab" role="tab" aria-selected="true" aria-controls="p1" id="t1">File Explorer</button>
+        <button class="tab" role="tab" aria-selected="false" aria-controls="p2" id="t2">NTFS file system</button>
+        <button class="tab" role="tab" aria-selected="false" aria-controls="p3" id="t3">Paths and drives</button>
+        <button class="tab" role="tab" aria-selected="false" aria-controls="p4" id="t4">Shortcuts</button>
+      </div>
+      <div class="card panel" role="tabpanel" id="p1" aria-labelledby="t1">
+        <p>File Explorer (open it with Win+E) is the main tool for browsing, copying, moving, renaming, searching, and deleting files. Deleted files go to the Recycle Bin first, so you can restore them.</p>
+      </div>
+      <div class="card panel" role="tabpanel" id="p2" aria-labelledby="t2" hidden>
+        <p>NTFS is the default Windows file system. It supports large files, file permissions, encryption (EFS), compression, and a journal that helps recover from crashes. FAT32 and exFAT are used on many USB drives.</p>
+      </div>
+      <div class="card panel" role="tabpanel" id="p3" aria-labelledby="t3" hidden>
+        <p>Storage is split into drive letters such as <code>C:\</code>. A path like <code>C:\Users\Sam\Documents\report.docx</code> shows the drive, folders, and file name. Windows uses backslashes in paths.</p>
+      </div>
+      <div class="card panel" role="tabpanel" id="p4" aria-labelledby="t4" hidden>
+        <ul class="clean">
+          <li><code>Ctrl+C</code> / <code>Ctrl+X</code> / <code>Ctrl+V</code>: copy, cut, paste</li>
+          <li><code>F2</code>: rename</li>
+          <li><code>Shift+Delete</code>: delete permanently, skipping the Recycle Bin</li>
+          <li><code>Win+E</code>: open File Explorer</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="security">
+      <h2>Security</h2>
+      <div class="grid">
+        <div class="card"><h3>Windows Security</h3><p>Includes Microsoft Defender Antivirus, a firewall, and ransomware protection.</p></div>
+        <div class="card"><h3>User Account Control</h3><p>UAC asks for permission before a program makes system-level changes.</p></div>
+        <div class="card"><h3>Accounts and permissions</h3><p>Standard and administrator accounts limit what each user can change. NTFS permissions control access to files.</p></div>
+        <div class="card"><h3>BitLocker</h3><p>Encrypts the whole drive so data is unreadable if the device is stolen.</p></div>
+        <div class="card"><h3>Windows Hello</h3><p>Sign in with a face, fingerprint, or PIN instead of a password.</p></div>
+        <div class="card"><h3>Windows Update</h3><p>Delivers security patches. Keeping it on is one of the best protections.</p></div>
+      </div>
+    </section>
+
+    <section id="quiz">
+      <h2>Quick check</h2>
+      <div class="card">
+        <h3 id="quizQ"></h3>
+        <div id="quizOpts"></div>
+        <p id="quizResult" aria-live="polite"></p>
+        <p style="margin-top:12px"><button class="btn" id="quizNext" type="button">Next question</button></p>
+      </div>
+    </section>
+  </main>
+
+  <footer>Interactive Operating Systems Explorer &middot; Chapter 8</footer>
+  <script>
+// Tabs (used on windows.html)
+document.querySelectorAll('.tabs').forEach(function (tabList) {
+  var tabs = tabList.querySelectorAll('.tab');
+  tabs.forEach(function (tab) {
+    tab.addEventListener('click', function () {
+      tabs.forEach(function (t) {
+        var selected = t === tab;
+        t.setAttribute('aria-selected', selected ? 'true' : 'false');
+        document.getElementById(t.getAttribute('aria-controls')).hidden = !selected;
+      });
+    });
+  });
+});
+
+// Quiz (used on windows.html)
+var quizQ = document.getElementById('quizQ');
+if (quizQ) {
+  var questions = [
+    { q: 'What is the default file system in modern Windows?', o: ['FAT32', 'NTFS', 'ext4', 'APFS'], a: 1 },
+    { q: 'Which feature asks permission before system-level changes?', o: ['BitLocker', 'Task Manager', 'User Account Control', 'Recycle Bin'], a: 2 },
+    { q: 'Which shortcut opens File Explorer?', o: ['Win+E', 'Ctrl+E', 'Alt+F', 'Win+X'], a: 0 },
+    { q: 'What does BitLocker do?', o: ['Blocks websites', 'Encrypts the drive', 'Speeds up boot', 'Scans for viruses'], a: 1 }
+  ];
+  var i = 0;
+  var opts = document.getElementById('quizOpts');
+  var result = document.getElementById('quizResult');
+
+  function showQuestion() {
+    var item = questions[i];
+    quizQ.textContent = item.q;
+    result.textContent = '';
+    opts.innerHTML = '';
+    item.o.forEach(function (text, idx) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'quiz-opt';
+      b.textContent = text;
+      b.addEventListener('click', function () {
+        var buttons = opts.querySelectorAll('.quiz-opt');
+        buttons.forEach(function (btn) { btn.disabled = true; });
+        buttons[item.a].classList.add('right');
+        if (idx === item.a) {
+          result.textContent = 'Correct.';
+        } else {
+          b.classList.add('wrong');
+          result.textContent = 'Not quite. The right answer is highlighted.';
+        }
+      });
+      opts.appendChild(b);
+    });
+  }
+
+  document.getElementById('quizNext').addEventListener('click', function () {
+    i = (i + 1) % questions.length;
+    showQuestion();
+  });
+  showQuestion();
+}
+</script>
+</body>
+</html>
