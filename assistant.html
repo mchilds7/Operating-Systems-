@@ -33,6 +33,7 @@
         <a href="linux.html">Linux</a>
         <a href="compare.html">Compare</a>
         <a href="assistant.html" aria-current="page">Assistant</a>
+        <a href="advisor.html">Advisor</a>
       </nav>
     </div>
   </header>
@@ -438,7 +439,8 @@
       for (k in w) wq.push(k + ':' + w[k]);
       say('bot', text, [
         { label: 'See my results on Compare', url: 'compare.html#w=' + wq.join(',') + '&section=match' },
-        { label: 'Open ' + NAME[best.o] + ' page', url: PAGE[best.o] }
+        { label: 'Open ' + NAME[best.o] + ' page', url: PAGE[best.o] },
+        { label: 'Try the full OS Advisor', url: 'advisor.html' }
       ]);
       setQuick(DEFAULT_QUICK);
     }

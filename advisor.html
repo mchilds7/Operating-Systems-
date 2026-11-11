@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OS Advisor | OS Explorer</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .step { display: inline-block; background: var(--accent); color: #fff; border-radius: 999px; padding: 2px 12px; font-size: 0.85rem; font-weight: 700; margin-bottom: 6px; }
+    @media (prefers-color-scheme: dark) { .step { color: #0b1420; } }
+    textarea, select { width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); color: var(--ink); font-size: 1rem; font-family: inherit; }
+    textarea { min-height: 90px; resize: vertical; }
+    label.f { display: block; font-weight: 600; margin-bottom: 4px; }
+    .form-grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); margin: 16px 0; }
+    .needs { display: grid; gap: 8px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); margin: 8px 0 16px; }
+    .needs label { display: flex; gap: 8px; align-items: center; background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; cursor: pointer; }
+    .needs input { width: 18px; height: 18px; }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0 14px; }
+    .chip { background: var(--surface); color: var(--ink); border: 1px solid var(--line); padding: 7px 14px; border-radius: 999px; cursor: pointer; font-size: 0.92rem; text-align: left; }
+    .chip:hover { border-color: var(--accent); }
+    .barrow { display: grid; grid-template-columns: 90px 1fr 48px; gap: 10px; align-items: center; margin-bottom: 6px; }
+    .track { background: var(--bg); border: 1px solid var(--line); border-radius: 4px; height: 20px; overflow: hidden; }
+    .fill { height: 100%; }
+    .val { font-weight: 600; text-align: right; }
+    .big { font-size: 1.6rem; font-weight: 700; margin: 0 0 6px; }
+    .note { background: var(--bg); border-left: 5px solid var(--accent); padding: 10px 14px; border-radius: 4px; margin: 12px 0; }
+    .small { color: var(--muted); font-size: 0.92rem; }
+    .acts { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+    details { margin-top: 14px; }
+    summary { cursor: pointer; font-weight: 600; }
+    .num { text-align: center; }
+  </style>
+</head>
+<body>
+  <header class="site">
+    <div class="bar">
+      <a class="brand" href="index.html">OS Explorer</a>
+      <nav aria-label="Main">
+        <a href="index.html">Home</a>
+        <a href="windows.html">Windows</a>
+        <a href="macos.html">macOS</a>
+        <a href="linux.html">Linux</a>
+        <a href="compare.html">Compare</a>
+        <a href="assistant.html">Assistant</a>
+        <a href="advisor.html" aria-current="page">Advisor</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="hero">
+      <h1>AI Operating System Advisor</h1>
+      <p>Describe what you need and get a recommendation with the reasons, the trade-offs, and the alternatives. No operating system is best for everyone, so this advisor shows its math.</p>
+    </div>
+
+    <section id="input">
+      <span class="step">Step 1</span>
+      <h2>Tell me your requirements</h2>
+      <div class="card">
+        <label class="f" for="text">Describe your situation in your own words (optional)</label>
+        <textarea id="text" placeholder="Example: I want to develop AI models and I have a limited budget."></textarea>
+        <p class="small" style="margin-top:6px">Try an example:</p>
+        <div class="chips" id="examples"></div>
+
+        <div class="form-grid">
+          <div>
+            <label class="f" for="budget">Budget</label>
+            <select id="budget">
+              <option value="">Not sure</option>
+              <option value="tight">Limited / tight</option>
+              <option value="moderate">Moderate</option>
+              <option value="flexible">Flexible</option>
+            </select>
+          </div>
+          <div>
+            <label class="f" for="exp">Experience with computers</label>
+            <select id="exp">
+              <option value="">Not sure</option>
+              <option value="beginner">Beginner</option>
+              <option value="some">Some experience</option>
+              <option value="advanced">Advanced</option>
+            </select>
+          </div>
+          <div>
+            <label class="f" for="hw">Hardware</label>
+            <select id="hw">
+              <option value="">No preference</option>
+              <option value="new">Buying a new computer</option>
+              <option value="pc">I already have a Windows or standard PC</option>
+              <option value="mac">I already have a Mac</option>
+              <option value="old">I have an old or low-spec computer</option>
+            </select>
+          </div>
+        </div>
+
+        <p class="f" style="font-weight:600;margin-bottom:0">Software and needs</p>
+        <div class="needs" id="needs">
+          <label><input type="checkbox" value="gaming"> Gaming</label>
+          <label><input type="checkbox" value="office"> School or office work</label>
+          <label><input type="checkbox" value="creative"> Creative work (video, photo, music)</label>
+          <label><input type="checkbox" value="dev"> Programming / computer science</label>
+          <label><input type="checkbox" value="ai"> AI / machine learning development</label>
+          <label><input type="checkbox" value="server"> Running a web server</label>
+          <label><input type="checkbox" value="security"> Security and privacy</label>
+          <label><input type="checkbox" value="apple"> I use an iPhone / Apple devices</label>
+        </div>
+        <button class="btn" id="go" type="button">Get my recommendation</button>
+      </div>
+    </section>
+
+    <section id="out" hidden>
+      <span class="step">Step 2</span>
+      <h2>How I analyzed it</h2>
+      <div class="card">
+        <p id="understood"></p>
+        <div id="bars" style="margin-top:12px"></div>
+        <details>
+          <summary>Show the scoring table</summary>
+          <p class="small" style="margin-top:8px">Each factor has a weight from 0 to 5 based on your answers, and each OS has a score from 1 to 5 for that factor. Match % = sum of (weight x score) divided by (5 x sum of weights).</p>
+          <div class="table-wrap"><table id="breakdown"></table></div>
+        </details>
+      </div>
+
+      <div style="margin-top:28px"><span class="step">Step 3</span></div>
+      <h2>Recommendation</h2>
+      <div class="card" id="rec" aria-live="polite"></div>
+      <div class="card" id="aiBox" style="margin-top:16px" hidden>
+        <h3>AI explanation</h3>
+        <p id="aiText"></p>
+      </div>
+    </section>
+
+    <section id="about">
+      <h2>About this advisor</h2>
+      <div class="grid">
+        <div class="card"><h3>Transparent scoring</h3><p>The recommendation comes from a visible JavaScript scoring system, not a black box. Open the scoring table to check every number.</p></div>
+        <div class="card"><h3>Honest about limits</h3><p>The ratings are simplified for learning. Your own priorities decide the result, and changing them can change the answer.</p></div>
+        <div class="card"><h3>Optional AI add-on</h3><p>A real AI model could write more flexible explanations. It must be called through your own server, never with an API key placed in this public page. The code has a ready-made hook for that.</p></div>
+      </div>
+    </section>
+  </main>
+
+  <footer>Interactive Operating Systems Explorer &middot; Chapter 8</footer>
+
+  <script>
+    // Optional: set this to the URL of YOUR OWN server or serverless function that holds an AI API key.
+    // The page sends only the requirements and scores to it (never a key). Leave empty to turn the AI add-on off.
+    var AI_ENDPOINT = '';
+
+    var OS = [
+      { id: 'win', name: 'Windows', color: '#0b6bcb', page: 'windows.html' },
+      { id: 'mac', name: 'macOS', color: '#7b61c9', page: 'macos.html' },
+      { id: 'lin', name: 'Linux', color: '#d9822b', page: 'linux.html' }
+    ];
+    var NAME = { win: 'Windows', mac: 'macOS', lin: 'Linux' };
+
+    // Factor ratings (1-5, higher is better for the user) and a short note for each OS.
+    var F = {
+      cost: { label: 'Low cost', s: { win: 3, mac: 2, lin: 5 }, n: {
+        win: 'The license is included with most PCs, and PC prices range from cheap to expensive.',
+        mac: 'It needs Apple hardware, which costs more up front.',
+        lin: 'It is free software and runs on almost any hardware.' } },
+      security: { label: 'Security', s: { win: 3, mac: 4, lin: 4 }, n: {
+        win: 'It has good built-in protection but is the most targeted by malware.',
+        mac: 'It has strong defaults such as Gatekeeper, FileVault, and permission prompts.',
+        lin: 'It has strict permissions and fast patching, if set up well.' } },
+      usability: { label: 'Ease of use', s: { win: 4, mac: 5, lin: 3 }, n: {
+        win: 'It is familiar to most people and easy to start with.',
+        mac: 'It is polished and consistent, especially with other Apple devices.',
+        lin: 'Beginner distros are friendly, but troubleshooting can require the terminal.' } },
+      compat: { label: 'Software compatibility', s: { win: 5, mac: 4, lin: 3 }, n: {
+        win: 'It runs the widest range of apps.',
+        mac: 'It has most major creative and productivity apps, but fewer games and niche business tools.',
+        lin: 'It has a large open-source catalog but limited commercial apps.' } },
+      custom: { label: 'Customization', s: { win: 3, mac: 2, lin: 5 }, n: {
+        win: 'It allows some customization, but the core design is fixed.',
+        mac: 'Customization is limited by design.',
+        lin: 'You can customize almost everything.' } },
+      gaming: { label: 'Gaming', s: { win: 5, mac: 2, lin: 3 }, n: {
+        win: 'It has the largest game library and the best graphics card support.',
+        mac: 'The game library is smaller, though Apple silicon is capable.',
+        lin: 'Many games run through Steam Proton, but some anti-cheat titles do not.' } },
+      dev: { label: 'Programming tools', s: { win: 3, mac: 4, lin: 5 }, n: {
+        win: 'Developer tools are good and WSL runs Linux tools, but it needs extra setup.',
+        mac: 'It is Unix-based with a Terminal and Xcode, which many developers like.',
+        lin: 'It has native developer tools and package managers, and matches most servers.' } },
+      ai: { label: 'AI / machine learning', s: { win: 3, mac: 3, lin: 5 }, n: {
+        win: 'NVIDIA CUDA works and WSL2 gives a Linux environment, with some extra setup.',
+        mac: 'Apple silicon suits prototyping and small models, but has no NVIDIA CUDA support.',
+        lin: 'It has the best support for CUDA, Docker, and the tools used in cloud AI training.' } },
+      server: { label: 'Running servers', s: { win: 3, mac: 2, lin: 5 }, n: {
+        win: 'Windows Server handles .NET and IIS well, but most web hosting uses Linux.',
+        mac: 'It is fine for local testing but rarely used to host real servers.',
+        lin: 'It powers most web servers with Apache, Nginx, Docker, and SSH.' } },
+      creative: { label: 'Creative software', s: { win: 4, mac: 5, lin: 3 }, n: {
+        win: 'It supports Adobe and many video and 3D tools.',
+        mac: 'It is a favorite for video, audio, and design, with Final Cut Pro and Logic Pro.',
+        lin: 'It has strong open-source tools like Blender and GIMP, but fewer industry-standard apps.' } },
+      office: { label: 'Office and school apps', s: { win: 5, mac: 4, lin: 3 }, n: {
+        win: 'Microsoft Office runs natively with every feature.',
+        mac: 'Office and Apple\'s own apps work well.',
+        lin: 'LibreOffice and web apps work, but desktop Microsoft Office is not available.' } },
+      ecosystem: { label: 'Apple device integration', s: { win: 2, mac: 5, lin: 2 }, n: {
+        win: 'It works with iPhone only through limited apps.',
+        mac: 'AirDrop, iMessage, Handoff, and iCloud work seamlessly.',
+        lin: 'It has little integration with Apple devices.' } },
+      hardware: { label: 'Fit with your hardware', s: null, n: null }
+    };
+    var HW = {
+      pc:  { s: { win: 5, mac: 1, lin: 4 }, n: { win: 'It already runs on your PC.', mac: 'macOS only runs on Apple hardware, so you would have to buy a Mac.', lin: 'It runs on most PCs and can be tried from a USB drive without erasing Windows.' } },
+      mac: { s: { win: 2, mac: 5, lin: 2 }, n: { win: 'On Apple silicon Macs, Windows only runs in a virtual machine, with limits.', mac: 'It already runs on your Mac.', lin: 'Linux can run in a virtual machine, but native support on Apple silicon is limited.' } },
+      old: { s: { win: 2, mac: 1, lin: 5 }, n: { win: 'Newer Windows versions may run slowly or be unsupported on old hardware.', mac: 'macOS only runs on Apple hardware, and old Macs stop getting updates.', lin: 'Lightweight distributions run well on old hardware.' } }
+    };
+    var LIMIT = {
+      win: 'Windows is the biggest malware target and can slow down without maintenance.',
+      mac: 'macOS needs Apple hardware and offers little customization or upgrading.',
+      lin: 'Linux has a learning curve and fewer commercial apps and games.'
+    };
+    var INSTEAD = {
+      win: 'Choose Windows instead if you need the widest software and game support, or rely on Microsoft Office and Windows-only apps.',
+      mac: 'Choose macOS instead if you value a polished experience and creative apps, or use an iPhone and other Apple devices, and can afford the hardware.',
+      lin: 'Choose Linux instead if you want a free, highly customizable system, enjoy learning the terminal, or will work with servers.'
+    };
+    var NEED_LABEL = { gaming: 'gaming', office: 'school or office work', creative: 'creative work', dev: 'programming', ai: 'AI development', server: 'running a web server', security: 'security and privacy', apple: 'Apple devices' };
+    var BUDGET_LABEL = { tight: 'limited budget', moderate: 'moderate budget', flexible: 'flexible budget' };
+    var EXP_LABEL = { beginner: 'beginner', some: 'some experience', advanced: 'advanced' };
+    var HW_LABEL = { new: 'buying a new computer', pc: 'already has a PC', mac: 'already has a Mac', old: 'old or low-spec computer' };
+
+    var EXAMPLES = [
+      'Which operating system is best for computer science students?',
+      'I want to develop AI models. Should I use Windows, macOS, or Linux?',
+      'Which system is suitable for gaming?',
+      'I have a limited budget. Which option should I consider?',
+      'Which operating system is best for managing a web server?'
+    ];
+
+    // ---------- Understanding the text ----------
+    function parseText(t) {
+      t = t.toLowerCase();
+      var r = { needs: [], budget: '', exp: '', hw: '' };
+      var N = [
+        ['gaming', /gam(e|es|er|ers|ing)\b|steam/],
+        ['office', /office|school|homework|\bword\b|excel|everyday|student|essay/],
+        ['creative', /video|photo|music|design|creative|photoshop|premiere|editing/],
+        ['dev', /program|cod(e|ing)|develop|computer science|\bcs\b|software eng|web dev/],
+        ['ai', /\bai\b|machine learning|deep learning|\bml\b|neural|pytorch|tensorflow|cuda|data science/],
+        ['server', /server|hosting|deploy|sysadmin|nginx|apache|docker/],
+        ['security', /secur|privacy|cyber|hack|pentest/],
+        ['apple', /iphone|ipad|apple watch|icloud|airdrop|apple device/]
+      ];
+      N.forEach(function (x) { if (x[1].test(t)) r.needs.push(x[0]); });
+      if (/flexible|money isn.?t|no budget limit|high.?end|plenty of money|can afford anything/.test(t)) r.budget = 'flexible';
+      else if (/limited budget|tight|cheap|low budget|afford|broke|free\b|budget/.test(t)) r.budget = 'tight';
+      if (/beginner|new to|never used|not technical|first computer|novice/.test(t)) r.exp = 'beginner';
+      else if (/advanced|expert|experienced|power user|sysadmin/.test(t)) r.exp = 'advanced';
+      if (/(i have|i own|my|already).{0,20}(mac\b|macbook|imac)/.test(t)) r.hw = 'mac';
+      else if (/old (laptop|pc|computer)|low.?spec|\bold hardware|slow computer/.test(t)) r.hw = 'old';
+      else if (/(i have|i own|my|already).{0,20}(windows|\bpc\b|laptop)/.test(t)) r.hw = 'pc';
+      return r;
+    }
+
+    // ---------- Scoring ----------
+    function buildWeights(req) {
+      var w = { security: 2, usability: 2, cost: 2, compat: 2, custom: 1, gaming: 0, dev: 0, ai: 0, server: 0, creative: 0, office: 0, ecosystem: 0, hardware: 0 };
+      if (req.budget === 'tight') w.cost = 5; else if (req.budget === 'moderate') w.cost = 3; else if (req.budget === 'flexible') w.cost = 1;
+      if (req.exp === 'beginner') { w.usability = 5; w.custom = 0; }
+      else if (req.exp === 'some') { w.usability = 3; w.custom = 1; }
+      else if (req.exp === 'advanced') { w.usability = 1; w.custom = 3; }
+      var has = function (n) { return req.needs.indexOf(n) > -1; };
+      if (has('gaming')) { w.gaming = 5; w.compat = Math.max(w.compat, 3); }
+      if (has('office')) w.office = 4;
+      if (has('creative')) { w.creative = 4; w.usability = Math.max(w.usability, 3); }
+      if (has('dev')) w.dev = 4;
+      if (has('ai')) { w.ai = 5; w.dev = Math.max(w.dev, 3); }
+      if (has('server')) { w.server = 5; w.security = Math.max(w.security, 4); }
+      if (has('security')) w.security = 5;
+      if (has('apple')) w.ecosystem = 5;
+      if (HW[req.hw]) w.hardware = req.hw === 'old' ? 5 : 4;
+      return w;
+    }
+    function scoreOf(f, os, req) {
+      if (f === 'hardware') return HW[req.hw].s[os];
+      return F[f].s[os];
+    }
+    function noteOf(f, os, req) {
+      if (f === 'hardware') return HW[req.hw].n[os];
+      return F[f].n[os];
+    }
+    function analyze(req) {
+      var w = buildWeights(req), total = 0, k;
+      for (k in w) total += w[k];
+      var res = OS.map(function (o) {
+        var sum = 0;
+        for (k in w) if (w[k] > 0) sum += w[k] * scoreOf(k, o.id, req);
+        return { id: o.id, pct: Math.round(sum / (5 * total) * 100) };
+      }).sort(function (a, b) { return b.pct - a.pct; });
+      return { w: w, res: res };
+    }
+
+    function recommend(req, a) {
+      var best = a.res[0].id, second = a.res[1].id, third = a.res[2].id;
+      var keys = Object.keys(a.w).filter(function (k) { return a.w[k] > 0; }).sort(function (x, y) { return a.w[y] - a.w[x]; });
+      var reasons = [], trade = [];
+      keys.forEach(function (k) {
+        var s = scoreOf(k, best, req);
+        if (a.w[k] >= 3 && s >= 4 && reasons.length < 4) reasons.push({ k: k, s: s });
+        if (a.w[k] >= 3 && s <= 3 && trade.length < 3) trade.push({ k: k, s: s });
+      });
+      // What could change the answer: where the runner-up beats the winner most
+      var flip = null, gap = 0;
+      keys.concat(['gaming', 'dev', 'ai', 'server', 'creative', 'office', 'ecosystem', 'cost', 'security', 'usability', 'compat', 'custom']).forEach(function (k) {
+        if (k === 'hardware') return;
+        var d = F[k].s[second] - F[k].s[best];
+        if (d > gap) { gap = d; flip = k; }
+      });
+      return { best: best, second: second, third: third, reasons: reasons, trade: trade, flip: flip, close: (a.res[0].pct - a.res[1].pct) <= 5 };
+    }
+
+    // ---------- Rendering ----------
+    function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+    function colorOf(id) { return OS.filter(function (o) { return o.id === id; })[0].color; }
+    function pageOf(id) { return OS.filter(function (o) { return o.id === id; })[0].page; }
+
+    function render(req) {
+      var a = analyze(req), r = recommend(req, a);
+      var pct = {};
+      a.res.forEach(function (x) { pct[x.id] = x.pct; });
+
+      // understood
+      var u = [];
+      if (req.needs.length) u.push('Needs: ' + req.needs.map(function (n) { return NEED_LABEL[n]; }).join(', '));
+      if (req.budget) u.push('Budget: ' + BUDGET_LABEL[req.budget]);
+      if (req.exp) u.push('Experience: ' + EXP_LABEL[req.exp]);
+      if (req.hw) u.push('Hardware: ' + HW_LABEL[req.hw]);
+      document.getElementById('understood').innerHTML = '<strong>What I understood:</strong> ' + esc(u.join(' | ')) + '<br><span class="small">If something is wrong, change the options above and press the button again.</span>';
+
+      // bars
+      var h = '';
+      a.res.forEach(function (x) {
+        h += '<div class="barrow"><span>' + NAME[x.id] + '</span><div class="track"><div class="fill" style="width:' + x.pct + '%;background:' + colorOf(x.id) + '"></div></div><span class="val">' + x.pct + '%</span></div>';
+      });
+      document.getElementById('bars').innerHTML = h;
+
+      // table
+      var keys = Object.keys(a.w).filter(function (k) { return a.w[k] > 0; });
+      var t = '<thead><tr><th>Factor</th><th class="num">Weight</th><th class="num">Windows</th><th class="num">macOS</th><th class="num">Linux</th></tr></thead><tbody>';
+      keys.forEach(function (k) {
+        t += '<tr><td>' + F[k].label + '</td><td class="num">' + a.w[k] + '</td>';
+        OS.forEach(function (o) { t += '<td class="num">' + scoreOf(k, o.id, req) + '</td>'; });
+        t += '</tr>';
+      });
+      t += '<tr><th>Match</th><th></th>';
+      OS.forEach(function (o) { t += '<th class="num">' + pct[o.id] + '%</th>'; });
+      document.getElementById('breakdown').innerHTML = t + '</tr></tbody>';
+
+      // recommendation
+      var rec = '';
+      if (r.close) {
+        rec += '<p class="big">A close call: ' + NAME[r.best] + ' and ' + NAME[r.second] + '</p>';
+        rec += '<p>' + NAME[r.best] + ' scores ' + pct[r.best] + '% and ' + NAME[r.second] + ' scores ' + pct[r.second] + '%. Either could work for you, so the details below matter more than the numbers.</p>';
+      } else {
+        rec += '<p class="big">Recommended: ' + NAME[r.best] + ' (' + pct[r.best] + '% match)</p>';
+      }
+      rec += '<h3 style="margin-top:14px">Why ' + NAME[r.best] + '</h3><ul class="clean">';
+      if (r.reasons.length) {
+        r.reasons.forEach(function (x) { rec += '<li><strong>' + F[x.k].label + ' (' + x.s + '/5):</strong> ' + esc(noteOf(x.k, r.best, req)) + '</li>'; });
+      } else {
+        rec += '<li>It has the best overall balance for what you described.</li>';
+      }
+      rec += '</ul>';
+      rec += '<h3 style="margin-top:14px">Trade-offs to know about</h3><ul class="clean">';
+      r.trade.forEach(function (x) { rec += '<li><strong>' + F[x.k].label + ' (' + x.s + '/5):</strong> ' + esc(noteOf(x.k, r.best, req)) + '</li>'; });
+      rec += '<li>' + esc(LIMIT[r.best]) + '</li></ul>';
+      rec += '<h3 style="margin-top:14px">Alternatives</h3><ul class="clean">';
+      rec += '<li><strong>' + NAME[r.second] + ' (' + pct[r.second] + '%):</strong> ' + esc(INSTEAD[r.second]) + '</li>';
+      rec += '<li><strong>' + NAME[r.third] + ' (' + pct[r.third] + '%):</strong> ' + esc(INSTEAD[r.third]) + '</li></ul>';
+      if (r.flip) {
+        rec += '<div class="note"><strong>What could change this answer:</strong> if ' + F[r.flip].label.toLowerCase() + ' mattered more to you, ' + NAME[r.second] + ' could move ahead (it scores ' + F[r.flip].s[r.second] + '/5 there, versus ' + F[r.flip].s[r.best] + '/5 for ' + NAME[r.best] + ').</div>';
+      }
+      rec += '<p class="small">This is guidance based on simplified ratings, not a verdict. No operating system is best for everyone.</p>';
+      rec += '<div class="acts"><a class="btn" href="' + pageOf(r.best) + '">Learn about ' + NAME[r.best] + '</a><a class="btn" href="compare.html#os=' + r.best + ',' + r.second + '&section=table">Compare the top two</a></div>';
+      document.getElementById('rec').innerHTML = rec;
+
+      document.getElementById('out').hidden = false;
+      document.getElementById('out').scrollIntoView();
+      askAI(req, a, r);
+    }
+
+    // Optional AI add-on (only runs if AI_ENDPOINT is set). Sends results only, never keys.
+    function askAI(req, a, r) {
+      var box = document.getElementById('aiBox');
+      box.hidden = true;
+      if (!AI_ENDPOINT) return;
+      fetch(AI_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ requirements: req, weights: a.w, results: a.res, recommended: r.best })
+      }).then(function (resp) { return resp.json(); }).then(function (d) {
+        if (d && d.text) { document.getElementById('aiText').textContent = d.text; box.hidden = false; }
+      }).catch(function () { /* keep the built-in explanation if the AI call fails */ });
+    }
+
+    // ---------- Form wiring ----------
+    function readForm() {
+      var needs = [];
+      document.querySelectorAll('#needs input').forEach(function (c) { if (c.checked) needs.push(c.value); });
+      return { needs: needs, budget: document.getElementById('budget').value, exp: document.getElementById('exp').value, hw: document.getElementById('hw').value };
+    }
+    function writeForm(req) {
+      document.querySelectorAll('#needs input').forEach(function (c) { c.checked = req.needs.indexOf(c.value) > -1; });
+      document.getElementById('budget').value = req.budget;
+      document.getElementById('exp').value = req.exp;
+      document.getElementById('hw').value = req.hw;
+    }
+    function run() {
+      var req = readForm();
+      var text = document.getElementById('text').value;
+      if (text.trim()) {
+        var p = parseText(text);
+        p.needs.forEach(function (n) { if (req.needs.indexOf(n) < 0) req.needs.push(n); });
+        if (p.budget) req.budget = p.budget;
+        if (p.exp) req.exp = p.exp;
+        if (p.hw) req.hw = p.hw;
+        writeForm(req);
+      }
+      if (!req.needs.length && !req.budget && !req.exp && !req.hw) {
+        alert('Please describe what you need or choose at least one option.');
+        return;
+      }
+      render(req);
+    }
+    document.getElementById('go').addEventListener('click', run);
+    EXAMPLES.forEach(function (q) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'chip';
+      b.textContent = q;
+      b.addEventListener('click', function () {
+        writeForm({ needs: [], budget: '', exp: '', hw: '' });
+        document.getElementById('text').value = q;
+        run();
+      });
+      document.getElementById('examples').appendChild(b);
+    });
+  </script>
+</body>
+</html>
