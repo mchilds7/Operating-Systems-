@@ -23,6 +23,7 @@
         <a href="macos.html">macOS</a>
         <a href="linux.html" aria-current="page">Linux</a>
         <a href="compare.html">Compare</a>
+        <a href="assistant.html">Assistant</a>
       </nav>
     </div>
   </header>
@@ -249,6 +250,14 @@
       showQuestion();
     });
     showQuestion();
-  </script>
+  
+(function () {
+  var p = {};
+  location.hash.replace(/^#/, '').split('&').forEach(function (s) { var kv = s.split('='); if (kv[0]) p[kv[0]] = decodeURIComponent(kv[1] || ''); });
+  if (p.tab) { var tb = document.querySelector('.tab[aria-controls="' + p.tab + '"]'); if (tb) tb.click(); }
+  if (/^[0-7]{3}$/.test(p.chmod || '')) { boxes.forEach(function (b) { b.checked = (Number(p.chmod[Number(b.dataset.g)]) & Number(b.dataset.v)) !== 0; }); updatePerms(); }
+  if (p.section) { var el = document.getElementById(p.section); if (el) { el.scrollIntoView(); window.scrollBy(0, -70); } }
+})();
+</script>
 </body>
 </html>

@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Module 5: AI Assistant | OS Explorer</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    #log { max-height: 55vh; min-height: 260px; overflow-y: auto; padding: 4px; }
+    .msg { max-width: 88%; padding: 10px 14px; border-radius: 12px; margin: 8px 0; white-space: pre-line; }
+    .msg p { margin: 0; }
+    .msg.user { margin-left: auto; background: var(--accent); color: #fff; }
+    @media (prefers-color-scheme: dark) { .msg.user { color: #0b1420; } }
+    .msg.bot { background: var(--bg); border: 1px solid var(--line); }
+    .acts { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .acts .btn, .acts .tab { padding: 6px 12px; font-size: 0.9rem; }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+    .chip { background: var(--surface); color: var(--ink); border: 1px solid var(--line); padding: 7px 14px; border-radius: 999px; cursor: pointer; font-size: 0.95rem; }
+    .chip:hover { border-color: var(--accent); }
+    form.chat { display: flex; gap: 8px; }
+    form.chat input[type="text"] { flex: 1; padding: 11px 12px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); color: var(--ink); font-size: 1rem; }
+    .small { color: var(--muted); font-size: 0.92rem; }
+  </style>
+</head>
+<body>
+  <header class="site">
+    <div class="bar">
+      <a class="brand" href="index.html">OS Explorer</a>
+      <nav aria-label="Main">
+        <a href="index.html">Home</a>
+        <a href="windows.html">Windows</a>
+        <a href="macos.html">macOS</a>
+        <a href="linux.html">Linux</a>
+        <a href="compare.html">Compare</a>
+        <a href="assistant.html" aria-current="page">Assistant</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="hero">
+      <h1>Module 5: OS Assistant</h1>
+      <p>Ask questions about Windows, macOS, and Linux, get a personal recommendation, or tell the assistant to open pages and set up the interactive features for you.</p>
+    </div>
+
+    <section>
+      <div class="card">
+        <div id="log" role="log" aria-live="polite" aria-label="Conversation"></div>
+        <div class="chips" id="quick" aria-label="Suggested replies"></div>
+        <form class="chat" id="form" autocomplete="off">
+          <input type="text" id="input" aria-label="Type your message" placeholder="Ask a question or give a command...">
+          <button class="btn" type="submit">Send</button>
+        </form>
+        <p style="margin-top:12px"><button class="tab" type="button" id="clear">Clear chat</button></p>
+      </div>
+    </section>
+
+    <section>
+      <h2>Things you can say</h2>
+      <div class="grid">
+        <div class="card"><h3>Ask</h3><p>"Is Linux free?" &middot; "Which OS is most secure?" &middot; "What is a kernel?" &middot; "Windows vs macOS"</p></div>
+        <div class="card"><h3>Get a recommendation</h3><p>"Recommend an OS" or "I'm a student on a budget" and I'll ask a few quick questions.</p></div>
+        <div class="card"><h3>Control the site</h3><p>"Open the chmod 640 calculator" &middot; "Show the gamer comparison" &middot; "Compare only Windows and Linux" &middot; "Open the Fedora tab" &middot; "Quiz me on Linux"</p></div>
+      </div>
+      <p class="small" style="margin-top:12px">This assistant is built into the page. It runs entirely in your browser using a knowledge base and rules about these three operating systems, and it does not send your messages to any outside AI service.</p>
+    </section>
+  </main>
+
+  <footer>Interactive Operating Systems Explorer &middot; Chapter 8</footer>
+
+  <script>
+    // ---------- Knowledge ----------
+    var NAME = { win: 'Windows', mac: 'macOS', lin: 'Linux' };
+    var PAGE = { win: 'windows.html', mac: 'macos.html', lin: 'linux.html' };
+    var TLABEL = { overview: 'Overview', security: 'Security', cost: 'Cost', gaming: 'Gaming', software: 'Software', custom: 'Customization', files: 'File system', users: 'Best for', pros: 'Advantages', cons: 'Disadvantages', terminal: 'Command line' };
+
+    var A = {
+      win: {
+        overview: "Windows is Microsoft's operating system and the most widely used desktop OS. It is known for broad hardware and software support, including most PC games.",
+        security: "Windows includes Defender antivirus, a firewall, User Account Control, BitLocker drive encryption, and Windows Hello sign-in. Its popularity makes it the biggest malware target, so updates and good habits matter.",
+        cost: "Windows is paid software, but the license is usually included in the price of a new PC. PCs come in a very wide range of prices, from budget to high-end.",
+        gaming: "Windows is the leading PC gaming platform thanks to DirectX, Steam, Xbox integration, and wide graphics card support.",
+        software: "Windows has the largest software library, including Microsoft Office, Adobe apps, most games, and many business programs. Older programs often still run.",
+        custom: "Windows offers themes, settings, and many third-party tools, but the core design stays fixed. It is less customizable than Linux.",
+        files: "Windows uses the NTFS file system with drive letters like C:\\ and File Explorer for managing files. NTFS supports permissions, encryption, and journaling.",
+        users: "Windows suits general users, gamers, students, and businesses that need wide software and hardware compatibility.",
+        pros: "Largest software library, wide hardware choice and price range, familiar interface, and strong school and workplace support.",
+        cons: "Most targeted by malware, can slow down over time, updates can interrupt you, and it is not free software.",
+        terminal: "Windows has Command Prompt, PowerShell, and Windows Terminal. PowerShell is a powerful scripting shell for automating tasks."
+      },
+      mac: {
+        overview: "macOS is Apple's operating system for Mac computers. It is built on Unix and designed to work closely with Apple hardware and devices like the iPhone.",
+        security: "macOS uses Gatekeeper, XProtect malware scanning, FileVault encryption, System Integrity Protection, and app permission prompts. It has strong defaults, though it is not immune to malware.",
+        cost: "macOS itself is free with a Mac, but Macs are expensive and hard to upgrade later. It only runs on Apple hardware.",
+        gaming: "Macs can play many games, especially on Apple silicon, but the library is much smaller than on Windows.",
+        software: "macOS has excellent creative and developer software such as Final Cut Pro, Logic Pro, Xcode, and Adobe apps. It has fewer games and business-specific tools than Windows.",
+        custom: "macOS is deliberately limited in customization to keep a consistent experience. You can change wallpapers, the Dock, and settings, but not much deeper.",
+        files: "macOS uses the APFS file system and Finder for file management. APFS is optimized for flash storage and supports snapshots and encryption.",
+        users: "macOS suits creatives, students, developers, and people who already use Apple devices.",
+        pros: "Polished and consistent, strong security and privacy defaults, great for creative work, and tight integration with iPhone, iPad, and iCloud.",
+        cons: "Expensive, Apple hardware only, little upgradeability, fewer games, and ecosystem lock-in.",
+        terminal: "macOS has Terminal with the zsh shell. Because it is Unix-based, many Linux commands like ls, cd, and grep work the same way."
+      },
+      lin: {
+        overview: "Linux is a free, open-source kernel started by Linus Torvalds in 1991. It comes in many distributions and powers servers, Android phones, and supercomputers.",
+        security: "Linux uses strict file permissions, regular accounts without admin rights by default, and fast community patching. Desktop viruses are rare, but security still depends on how well the system is set up.",
+        cost: "Linux is free to download and use, and it runs well on older hardware, making it the cheapest option.",
+        gaming: "Linux gaming has improved a lot thanks to Steam and Proton, but some games, especially ones with anti-cheat, still do not run.",
+        software: "Linux has a huge open-source catalog (Firefox, LibreOffice, GIMP, Blender). Commercial apps like Adobe and Microsoft Office are limited or missing.",
+        custom: "Linux is the most customizable. You can pick your desktop environment (GNOME, KDE, Xfce), theme, shell, and even the kernel.",
+        files: "Linux commonly uses ext4 and one directory tree starting at /, with no drive letters. Permissions are set for owner, group, and others.",
+        users: "Linux suits developers, server administrators, students learning computing, and people who want control or want to revive an older PC.",
+        pros: "Free, open, highly customizable, strong security model, runs on old hardware, and the standard for servers.",
+        cons: "Steeper learning curve, fewer commercial apps and games, varying hardware driver support, and a confusing number of distros.",
+        terminal: "The terminal is central in Linux. Common commands are ls, cd, pwd, cp, mv, rm, grep, chmod, and sudo. Package managers like apt install software."
+      }
+    };
+
+    var GENERAL = [
+      { re: /what is (an? )?(os|operating system)|what does (an? )?(os|operating system) do|define (os|operating system)/, a: "An operating system manages a computer's hardware and gives programs a safe way to use it. Its main jobs are running processes, managing memory, handling files, controlling devices, and enforcing security." },
+      { re: /kernel/, a: "The kernel is the core of an OS. It talks to hardware, schedules processes, manages memory, and enforces permissions. Linux is a kernel, Windows uses the NT kernel, and macOS uses XNU." },
+      { re: /process|multitask|schedul|task manager/, a: "A process is a running program. The OS scheduler gives each process short turns on the CPU, so many programs seem to run at once (multitasking). You can see processes in Task Manager on Windows, Activity Monitor on macOS, and top on Linux." },
+      { re: /memory|\bram\b|paging|swap/, a: "Memory management gives each process its own address space and moves data between RAM and disk (virtual memory) when RAM fills up. This also protects programs from interfering with each other." },
+      { re: /permission|chmod|chown|access control/, a: "Permissions control who can read, write, or run a file. Linux and macOS use owner, group, and others with r=4, w=2, x=1 (for example chmod 755). Windows uses NTFS access control lists. Try the chmod calculator on the Linux page." },
+      { re: /distro|distribution/, a: "A Linux distribution bundles the Linux kernel with a package manager, a desktop, and apps. Examples are Ubuntu, Debian, Fedora, Arch, Mint, and Kali." },
+      { re: /open.?source|\bgpl\b/, a: "Open-source software has public code that anyone can read, change, and share, often under licenses like the GPL. Linux is open source. Windows and macOS are proprietary, though macOS has an open-source Unix core called Darwin." },
+      { re: /driver/, a: "A driver is software that lets the OS talk to a specific piece of hardware, such as a printer or graphics card. Windows has the widest driver support." }
+    ];
+
+    // ---------- Chat plumbing ----------
+    var SK = 'osx_chat_v1';
+    var log = document.getElementById('log');
+    var quick = document.getElementById('quick');
+    var input = document.getElementById('input');
+    var chat = [];
+    var flow = null;
+
+    function save() { try { sessionStorage.setItem(SK, JSON.stringify(chat.slice(-60))); } catch (e) {} }
+    function load() { try { return JSON.parse(sessionStorage.getItem(SK) || '[]'); } catch (e) { return []; } }
+
+    function render(m) {
+      var d = document.createElement('div');
+      d.className = 'msg ' + m.who;
+      var p = document.createElement('p');
+      p.textContent = m.text;
+      d.appendChild(p);
+      if (m.actions && m.actions.length) {
+        var row = document.createElement('div');
+        row.className = 'acts';
+        m.actions.forEach(function (a) {
+          var l = document.createElement('a');
+          l.className = 'btn';
+          l.href = a.url;
+          l.textContent = a.label;
+          row.appendChild(l);
+        });
+        d.appendChild(row);
+      }
+      log.appendChild(d);
+      log.scrollTop = log.scrollHeight;
+      return d;
+    }
+    function say(who, text, actions) {
+      var m = { who: who, text: text, actions: actions || [] };
+      chat.push(m);
+      save();
+      return render(m);
+    }
+    function setQuick(list) {
+      quick.innerHTML = '';
+      list.forEach(function (label) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'chip';
+        b.textContent = label;
+        b.addEventListener('click', function () { handle(label); });
+        quick.appendChild(b);
+      });
+    }
+    var DEFAULT_QUICK = ['Recommend an OS', 'Is Linux free?', 'Compare security', 'Open the chmod 640 calculator', 'Show the gamer comparison', 'Quiz me on macOS'];
+
+    function autoOpen(label, url) {
+      var d = say('bot', 'Opening ' + label + ' in a moment...', [{ label: 'Open now', url: url }]);
+      var cancel = document.createElement('button');
+      cancel.type = 'button';
+      cancel.className = 'tab';
+      cancel.textContent = 'Cancel';
+      var t = setTimeout(function () { location.href = url; }, 1600);
+      cancel.addEventListener('click', function () { clearTimeout(t); cancel.remove(); });
+      d.querySelector('.acts').appendChild(cancel);
+    }
+
+    // ---------- Detection helpers ----------
+    var OSN = {
+      win: /windows|microsoft|\bwin ?1[01]\b/,
+      mac: /\bmac\b|macos|apple|os ?x|macbook/,
+      lin: /linux|ubuntu|debian|fedora|distro|\barch\b|\bmint\b|\bkali\b/
+    };
+    var TOPICS = [
+      ['security', /secur|virus|malware|safe|hack|encrypt|privacy/],
+      ['cost', /cost|price|free|cheap|expensive|afford|licen/],
+      ['gaming', /\bgam(e|es|ing|er|ers)\b|steam/],
+      ['software', /software|\bapps?\b|programs|compatib|photoshop|office|adobe/],
+      ['custom', /custom|personali|theme|tweak|desktop environment/],
+      ['files', /file system|ntfs|apfs|ext4|file manag|finder|explorer|folder/],
+      ['users', /who (is|should|uses)|intended|best for|audience|suited/],
+      ['pros', /advantage|\bpros?\b|strength|benefit|why use/],
+      ['cons', /disadvantage|\bcons?\b|weakness|limitation|downside|drawback/],
+      ['terminal', /terminal|command|shell|bash|powershell|\bcli\b/]
+    ];
+    function osIn(t) { return ['win', 'mac', 'lin'].filter(function (k) { return OSN[k].test(t); }); }
+    function topicsIn(t) {
+      var r = [];
+      TOPICS.forEach(function (x) { if (x[1].test(t) && r.length < 2) r.push(x[0]); });
+      return r;
+    }
+
+    // ---------- Answers ----------
+    function answer(t) {
+      var oss = osIn(t), topics = topicsIn(t), actions = [];
+      var mentioned = oss.slice();
+      var text;
+      if (topics.length) {
+        if (!oss.length) oss = ['win', 'mac', 'lin'];
+        var lines = [];
+        topics.forEach(function (tp) {
+          oss.forEach(function (o) {
+            var pre = (oss.length > 1 ? NAME[o] + ': ' : '') + (topics.length > 1 ? TLABEL[tp] + ' - ' : '');
+            lines.push(pre + A[o][tp]);
+          });
+        });
+        text = lines.join('\n\n');
+      } else {
+        var g = null;
+        GENERAL.forEach(function (x) { if (!g && x.re.test(t)) g = x; });
+        if (g) { text = g.a; }
+        else if (oss.length) {
+          text = oss.map(function (o) { return (oss.length > 1 ? NAME[o] + ': ' : '') + A[o].overview; }).join('\n\n');
+          if (oss.length > 1) text += '\n\nAsk about security, cost, software, gaming, or customization to compare them in detail.';
+        } else {
+          say('bot', "I'm not sure about that one. I can answer questions about Windows, macOS, and Linux (security, cost, software, gaming, customization, file systems, terminals), explain OS concepts like kernels and processes, recommend an OS, or open parts of this site for you.");
+          setQuick(DEFAULT_QUICK);
+          return;
+        }
+      }
+      if (mentioned.length === 1) actions.push({ label: 'Open ' + NAME[mentioned[0]] + ' page', url: PAGE[mentioned[0]] });
+      else if (mentioned.length > 1 || (topics.length && !mentioned.length)) {
+        var u = 'compare.html#section=table';
+        if (mentioned.length > 1) u = 'compare.html#os=' + mentioned.join(',') + '&section=table';
+        actions.push({ label: 'See it on the Compare page', url: u });
+      }
+      say('bot', text, actions);
+      setQuick(DEFAULT_QUICK);
+    }
+
+    // ---------- Commands that control the site ----------
+    var PRESET_RE = [['gamer', /gam(er|ers|ing|e)/], ['developer', /develop|program|coder|coding/], ['creative', /creativ|design|artist|video|photo/], ['student', /student|budget/], ['business', /business|enterprise|company/]];
+    var CRIT_RE = [['security', /secur/], ['usability', /usab|ease of use|easy/], ['cost', /cost|price/], ['compat', /compat|software/], ['custom', /custom/], ['users', /intended|audience|users/]];
+    var TAB_MAP = {
+      lin: [['d1', /ubuntu/], ['d2', /debian/], ['d3', /fedora/], ['d4', /\barch\b/], ['d5', /\bmint\b/], ['d6', /\bkali\b/]],
+      win: [['p1', /file explorer/], ['p2', /ntfs/], ['p3', /path|drive/], ['p4', /shortcut/]],
+      mac: [['i1', /menu bar/], ['i2', /\bdock\b/], ['i3', /finder/], ['i4', /spotlight/], ['i5', /mission control/]]
+    };
+    var SECTION_MAP = {
+      win: [['security', /secur/], ['files', /file/], ['apps', /app/], ['features', /feature/], ['proscons', /advantage|disadvantage|pros|cons/]],
+      mac: [['security', /secur/], ['hardware', /hardware|apple silicon|chip/], ['interface', /interface|dock|finder/], ['software', /software|app/], ['limits', /limit|advantage/]],
+      lin: [['terminal', /terminal|command/], ['permissions', /permission|chmod/], ['servers', /server/], ['custom', /custom/], ['distros', /distro/], ['opensource', /open/]]
+    };
+
+    function tryCommand(t) {
+      var isCmd = /^(please\s+)?(can you\s+)?(open|show|go|take|navigate|jump|display|set|filter|hide|switch|load|launch|start|compare|quiz)\b/.test(t) || /\bchmod\s*[0-7]{3}\b/.test(t) || /\bquiz\b/.test(t);
+      if (!isCmd) return false;
+      var oss = osIn(t);
+
+      // chmod calculator
+      var cm = t.match(/chmod\s*([0-7]{3})/);
+      if (cm || /calculator/.test(t)) {
+        var code = cm ? cm[1] : '755';
+        autoOpen('the chmod calculator set to ' + code, 'linux.html#section=permissions&chmod=' + code);
+        return true;
+      }
+
+      // quiz
+      if (/quiz/.test(t)) {
+        if (oss.length === 1) { autoOpen('the ' + NAME[oss[0]] + ' quiz', PAGE[oss[0]] + '#section=quiz'); }
+        else { say('bot', 'Which quiz would you like?', ['win', 'mac', 'lin'].map(function (o) { return { label: NAME[o] + ' quiz', url: PAGE[o] + '#section=quiz' }; })); }
+        return true;
+      }
+
+      // tab on an OS page
+      for (var k in TAB_MAP) {
+        for (var i = 0; i < TAB_MAP[k].length; i++) {
+          if (TAB_MAP[k][i][1].test(t) && (oss.length === 0 || oss.indexOf(k) > -1) && !/compar/.test(t)) {
+            autoOpen('the ' + NAME[k] + ' page with that tab selected', PAGE[k] + '#section=' + (k === 'lin' ? 'distros' : k === 'win' ? 'files' : 'interface') + '&tab=' + TAB_MAP[k][i][0]);
+            return true;
+          }
+        }
+      }
+
+      // comparison page control
+      var ctx = /compar|chart|table|filter|preset|\bonly\b|\bhide\b|match|slider|weight|rank|\bvs\b/.test(t) || /\bset\b.*\b[0-5]\b/.test(t);
+      var preset = null;
+      PRESET_RE.forEach(function (p) { if (!preset && p[1].test(t)) preset = p[0]; });
+      if (ctx || (preset && /^(show|open|load|set)/.test(t) && /compar|match|preset/.test(t))) {
+        var parts = [], hide = /hide|without|except|remove|exclude/.test(t);
+        if (ctx && preset && /compar|preset|match|gamer|developer|creative|student|business/.test(t)) parts.push('preset=' + preset);
+        if (oss.length) {
+          var ids = hide ? ['win', 'mac', 'lin'].filter(function (o) { return oss.indexOf(o) < 0; }) : oss;
+          if (ids.length) parts.push('os=' + ids.join(','));
+        }
+        var crits = [];
+        CRIT_RE.forEach(function (c) { if (c[1].test(t)) crits.push(c[0]); });
+        var wparts = [];
+        if (/set|slider|weight|importance|priority|matter/.test(t)) {
+          var re = /(security|usability|cost|compat\w*|software|custom\w*)\D{0,12}?([0-5])\b/g, m;
+          while ((m = re.exec(t))) {
+            var key = /secur/.test(m[1]) ? 'security' : /usab/.test(m[1]) ? 'usability' : /cost/.test(m[1]) ? 'cost' : /compat|software/.test(m[1]) ? 'compat' : 'custom';
+            wparts.push(key + ':' + m[2]);
+          }
+        }
+        if (wparts.length) { parts.push('w=' + wparts.join(',')); }
+        else if (crits.length) {
+          var all = ['security', 'usability', 'cost', 'compat', 'custom', 'users'];
+          var cl = hide ? all.filter(function (c) { return crits.indexOf(c) < 0; }) : crits;
+          if (cl.length) parts.push('crit=' + cl.join(','));
+        }
+        parts.push('section=' + ((preset || wparts.length) ? 'match' : 'table'));
+        var label = preset ? 'the comparison page with the ' + preset + ' preset' : 'the comparison page with your filters';
+        autoOpen(label, 'compare.html#' + parts.join('&'));
+        return true;
+      }
+
+      // plain navigation
+      if (/\bhome\b/.test(t)) { autoOpen('the home page', 'index.html'); return true; }
+      if (oss.length === 1) {
+        var o = oss[0], sec = '';
+        SECTION_MAP[o].forEach(function (s) { if (!sec && s[1].test(t)) sec = s[0]; });
+        autoOpen('the ' + NAME[o] + ' page' + (sec ? ' (' + sec + ' section)' : ''), PAGE[o] + (sec ? '#section=' + sec : ''));
+        return true;
+      }
+      return false;
+    }
+
+    // ---------- Recommendation flow ----------
+    var STEPS = [
+      { q: 'What will you mainly use the computer for?', opts: ['Gaming', 'School or office work', 'Programming', 'Creative work (video, photo, music)', 'Running a server'] },
+      { q: 'What is your budget?', opts: ['Tight budget', 'Flexible budget'] },
+      { q: 'How comfortable are you with technical setup?', opts: ['Beginner', 'Comfortable', 'Advanced'] }
+    ];
+    function det0(t) {
+      if (/gam(e|er|ing)/.test(t)) return 'gaming';
+      if (/program|cod(e|ing)|develop|computer science|software eng/.test(t)) return 'dev';
+      if (/creat|video|photo|music|design|art\b/.test(t)) return 'creative';
+      if (/server|host/.test(t)) return 'server';
+      if (/school|office|work|study|student|homework|general|everyday/.test(t)) return 'office';
+      return null;
+    }
+    function det1(t) {
+      if (/flex|plenty|big|no limit|high|any budget|expensive/.test(t)) return 'flex';
+      if (/tight|low|cheap|limit|small|free|little|budget/.test(t)) return 'tight';
+      return null;
+    }
+    function det2(t) {
+      if (/begin|new to|none|basic|novice/.test(t)) return 'beg';
+      if (/advanced|expert|pro\b|experienced/.test(t)) return 'adv';
+      if (/comfortable|some|medium|okay|intermediate/.test(t)) return 'mid';
+      return null;
+    }
+    var DET = [det0, det1, det2];
+
+    function startFlow(t) {
+      flow = { step: 0, a: {} };
+      for (var i = 0; i < 3; i++) { var v = DET[i](t); if (v) flow.a[i] = v; }
+      nextStep();
+    }
+    function nextStep() {
+      while (flow.step < 3 && flow.a[flow.step]) flow.step++;
+      if (flow.step >= 3) { finishFlow(); return; }
+      say('bot', STEPS[flow.step].q);
+      setQuick(STEPS[flow.step].opts.concat(['Cancel']));
+    }
+    function continueFlow(t) {
+      if (/^(cancel|stop|never ?mind|quit)/.test(t)) {
+        flow = null;
+        say('bot', 'No problem. Ask me anything else whenever you like.');
+        setQuick(DEFAULT_QUICK);
+        return true;
+      }
+      var v = DET[flow.step](t);
+      if (!v) { say('bot', "Sorry, I didn't catch that. Please pick one of the options below."); setQuick(STEPS[flow.step].opts.concat(['Cancel'])); return true; }
+      flow.a[flow.step] = v;
+      flow.step++;
+      nextStep();
+      return true;
+    }
+
+    var SCORES = {
+      win: { security: 3, usability: 4, cost: 3, compat: 5, custom: 3 },
+      mac: { security: 4, usability: 5, cost: 2, compat: 4, custom: 2 },
+      lin: { security: 4, usability: 3, cost: 5, compat: 3, custom: 5 }
+    };
+    var CLABEL = { security: 'security', usability: 'ease of use', cost: 'low cost', compat: 'software compatibility', custom: 'customization' };
+
+    function finishFlow() {
+      var a = flow.a;
+      flow = null;
+      var w = { security: 3, usability: 3, cost: 3, compat: 3, custom: 2 };
+      if (a[0] === 'gaming') { w.compat = 5; w.security = 2; }
+      if (a[0] === 'office') { w.compat = 4; w.usability = 4; }
+      if (a[0] === 'dev') { w.custom = 4; w.security = 4; }
+      if (a[0] === 'creative') { w.usability = 5; w.compat = 4; w.custom = 1; }
+      if (a[0] === 'server') { w.security = 5; w.custom = 4; w.cost = 4; w.usability = 2; }
+      if (a[1] === 'tight') w.cost = 5;
+      if (a[1] === 'flex') w.cost = 1;
+      if (a[2] === 'beg') w.usability = Math.max(w.usability, 4);
+      if (a[2] === 'adv') { w.custom = Math.min(5, w.custom + 1); w.usability = Math.max(1, w.usability - 1); }
+
+      var total = 0, k;
+      for (k in w) total += w[k];
+      var res = ['win', 'mac', 'lin'].map(function (o) {
+        var s = 0;
+        for (k in w) s += w[k] * SCORES[o][k];
+        return { o: o, pct: Math.round(s / total / 5 * 100) };
+      }).sort(function (x, y) { return y.pct - x.pct; });
+
+      var best = res[0], second = res[1];
+      var why = [];
+      for (k in w) if (w[k] >= 4 && SCORES[best.o][k] >= 4) why.push(CLABEL[k]);
+      var text;
+      if (best.pct === second.pct) {
+        text = 'Based on your answers, ' + NAME[best.o] + ' and ' + NAME[second.o] + ' are tied at ' + best.pct + '%. Both fit you equally well, so the deciding factor is which software and hardware you prefer.';
+      } else {
+        text = 'Based on your answers, I recommend ' + NAME[best.o] + ' (' + best.pct + '% match), with ' + NAME[second.o] + ' next at ' + second.pct + '%.\n\n' +
+          (why.length ? 'It fits because you value ' + why.join(' and ') + ', where it scores 4 or 5 out of 5.' : 'It has the best overall balance for what you told me.') +
+          '\n\nDownsides to keep in mind: ' + A[best.o].cons;
+      }
+      var wq = [];
+      for (k in w) wq.push(k + ':' + w[k]);
+      say('bot', text, [
+        { label: 'See my results on Compare', url: 'compare.html#w=' + wq.join(',') + '&section=match' },
+        { label: 'Open ' + NAME[best.o] + ' page', url: PAGE[best.o] }
+      ]);
+      setQuick(DEFAULT_QUICK);
+    }
+
+    // ---------- Main handler ----------
+    function handle(raw) {
+      var t = raw.toLowerCase().trim();
+      if (!t) return;
+      say('user', raw);
+      if (flow) { continueFlow(t); return; }
+      if (/^(hi|hello|hey|yo|good (morning|afternoon|evening))\b/.test(t)) { say('bot', 'Hello! Ask me about Windows, macOS, or Linux, say "recommend an OS", or tell me to open something on the site.'); setQuick(DEFAULT_QUICK); return; }
+      if (/^(thanks|thank you|thx)/.test(t)) { say('bot', "You're welcome! Anything else you'd like to know?"); return; }
+      if (/are you (an? )?(ai|bot|human|real|chatgpt|claude)|who (are|made|built) you|how do you work/.test(t)) {
+        say('bot', "I'm a built-in assistant for this site. I run in your browser using a knowledge base and rules about Windows, macOS, and Linux. I don't connect to an outside AI service, so I can only answer topics I was built to cover.");
+        return;
+      }
+      if (/recommend|which (os|operating system)|help me (choose|pick|decide)|what should i (use|get|buy|choose)|should i (use|get|buy|choose|switch)|best (os|operating system) for me|\bi('m| am) (a |an )?(gamer|student|developer|designer|programmer|beginner)/.test(t)) { startFlow(t); return; }
+      if (/what can you do|^help\b|commands/.test(t) && !/terminal|linux|shell/.test(t)) {
+        say('bot', 'I can: (1) answer questions about the three operating systems and OS concepts, (2) recommend one after a few questions, and (3) control the site: open pages and sections, select tabs, set the chmod calculator, apply comparison filters and presets, and open quizzes.');
+        setQuick(DEFAULT_QUICK);
+        return;
+      }
+      if (tryCommand(t)) return;
+      answer(t);
+    }
+
+    // ---------- Init ----------
+    document.getElementById('form').addEventListener('submit', function (e) {
+      e.preventDefault();
+      var v = input.value;
+      input.value = '';
+      handle(v);
+    });
+    document.getElementById('clear').addEventListener('click', function () {
+      chat = []; flow = null; save(); log.innerHTML = '';
+      welcome();
+    });
+    function welcome() {
+      say('bot', 'Hi! I am the OS Assistant. I can answer questions about Windows, macOS, and Linux, recommend one for you, and open or set up parts of this website. What would you like to do?');
+      setQuick(DEFAULT_QUICK);
+    }
+    var saved = load();
+    if (saved.length) { chat = saved; chat.forEach(render); setQuick(DEFAULT_QUICK); }
+    else welcome();
+  </script>
+</body>
+</html>

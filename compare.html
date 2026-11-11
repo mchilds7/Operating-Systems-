@@ -35,6 +35,7 @@
         <a href="macos.html">macOS</a>
         <a href="linux.html">Linux</a>
         <a href="compare.html" aria-current="page">Compare</a>
+        <a href="assistant.html">Assistant</a>
       </nav>
     </div>
   </header>
@@ -124,6 +125,7 @@
         b.type = 'button';
         b.className = 'chip';
         b.setAttribute('aria-pressed', 'true');
+        b.setAttribute('data-id', it.id);
         b.textContent = label(it);
         b.addEventListener('click', function () {
           state[it.id] = !state[it.id];
@@ -263,6 +265,24 @@
     renderTable();
     renderCharts();
     renderMatch();
-  </script>
+  
+(function () {
+  var p = {};
+  location.hash.replace(/^#/, '').split('&').forEach(function (s) { var kv = s.split('='); if (kv[0]) p[kv[0]] = decodeURIComponent(kv[1] || ''); });
+  function applyList(boxId, state, ids) {
+    document.querySelectorAll('#' + boxId + ' .chip').forEach(function (b) {
+      var id = b.getAttribute('data-id'), on = ids.indexOf(id) > -1;
+      state[id] = on;
+      b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+  }
+  if (p.os) applyList('osChips', showOS, p.os.split(','));
+  if (p.crit) applyList('critChips', showCrit, p.crit.split(','));
+  if (p.preset) { document.querySelectorAll('#presets .chip').forEach(function (b) { if (b.textContent.toLowerCase().indexOf(p.preset) === 0) b.click(); }); }
+  if (p.w) { p.w.split(',').forEach(function (s) { var kv = s.split(':'); var el = document.getElementById('w_' + kv[0]); if (el && /^[0-5]$/.test(kv[1])) { el.value = kv[1]; el.dispatchEvent(new Event('input')); } }); }
+  renderTable(); renderCharts(); renderMatch();
+  if (p.section) { var el = document.getElementById(p.section); if (el) { el.scrollIntoView(); window.scrollBy(0, -70); } }
+})();
+</script>
 </body>
 </html>
