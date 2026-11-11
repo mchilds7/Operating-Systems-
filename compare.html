@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Module 4: Interactive Comparison | OS Explorer</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0 16px; }
+    .chip { background: var(--surface); color: var(--ink); border: 1px solid var(--line); padding: 7px 14px; border-radius: 999px; cursor: pointer; font-size: 0.95rem; }
+    .chip[aria-pressed="true"] { background: var(--accent); color: #fff; border-color: var(--accent); }
+    @media (prefers-color-scheme: dark) { .chip[aria-pressed="true"] { color: #0b1420; } }
+    .dot { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 6px; }
+    .group { margin-bottom: 22px; }
+    .group h3 { margin-bottom: 8px; }
+    .barrow { display: grid; grid-template-columns: 90px 1fr 48px; gap: 10px; align-items: center; margin-bottom: 6px; }
+    .track { background: var(--bg); border: 1px solid var(--line); border-radius: 4px; height: 20px; overflow: hidden; }
+    .fill { height: 100%; }
+    .val { font-weight: 600; text-align: right; }
+    .sliders { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); margin: 12px 0; }
+    .sliders label { display: block; font-weight: 600; }
+    .sliders input[type="range"] { width: 100%; }
+    .small { color: var(--muted); font-size: 0.92rem; }
+    td small { display: block; color: var(--muted); margin-top: 2px; }
+    #best { font-weight: 700; margin-top: 12px; }
+  </style>
+</head>
+<body>
+  <header class="site">
+    <div class="bar">
+      <a class="brand" href="index.html">OS Explorer</a>
+      <nav aria-label="Main">
+        <a href="index.html">Home</a>
+        <a href="windows.html">Windows</a>
+        <a href="macos.html">macOS</a>
+        <a href="linux.html">Linux</a>
+        <a href="compare.html" aria-current="page">Compare</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="hero">
+      <h1>Module 4: Interactive comparison</h1>
+      <p>Compare Windows, macOS, and Linux side by side. Choose what to show, then set your own priorities to see which one fits you best.</p>
+    </div>
+
+    <section id="filters">
+      <h2>Filters</h2>
+      <p class="small">Click to show or hide. These filters control the table and the charts.</p>
+      <h3>Operating systems</h3>
+      <div class="chips" id="osChips"></div>
+      <h3>Categories</h3>
+      <div class="chips" id="critChips"></div>
+    </section>
+
+    <section id="table">
+      <h2>Comparison table</h2>
+      <div class="table-wrap"><table id="cmpTable"></table></div>
+      <p class="small" style="margin-top:8px">Ratings are on a 1 to 5 scale where 5 is best. For cost, 5 means cheapest. They are simplified, general ratings for learning, not lab benchmarks.</p>
+    </section>
+
+    <section id="charts">
+      <h2>Charts</h2>
+      <div class="card" id="chartBox"></div>
+    </section>
+
+    <section id="match">
+      <h2>Find your best match</h2>
+      <p>Set how much each category matters to you (0 means it doesn't matter, 5 means it matters a lot), or start from a preset.</p>
+      <div class="chips" id="presets"></div>
+      <div class="card">
+        <div class="sliders" id="sliders"></div>
+        <div id="matchBars"></div>
+        <p id="best" aria-live="polite"></p>
+      </div>
+    </section>
+  </main>
+
+  <footer>Interactive Operating Systems Explorer &middot; Chapter 8</footer>
+
+  <script>
+    var OS = [
+      { id: 'win', name: 'Windows', color: '#0b6bcb' },
+      { id: 'mac', name: 'macOS', color: '#7b61c9' },
+      { id: 'lin', name: 'Linux', color: '#d9822b' }
+    ];
+
+    var CRITERIA = [
+      { id: 'security', label: 'Security', scores: { win: 3, mac: 4, lin: 4 }, notes: {
+          win: 'Strong built-in tools, but the biggest malware target.',
+          mac: 'Gatekeeper, FileVault, and sandboxing by default.',
+          lin: 'Strict permissions and fast patching; depends on user setup.' } },
+      { id: 'usability', label: 'Usability', scores: { win: 4, mac: 5, lin: 3 }, notes: {
+          win: 'Familiar desktop and easy for most people.',
+          mac: 'Polished and consistent across Apple devices.',
+          lin: 'Easy on beginner distros, steeper for advanced tasks.' } },
+      { id: 'cost', label: 'Cost', scores: { win: 3, mac: 2, lin: 5 }, notes: {
+          win: 'License is usually included in the PC price.',
+          mac: 'Free with a Mac, but Apple hardware is costly.',
+          lin: 'Free software that runs on almost any hardware.' } },
+      { id: 'compat', label: 'Software compatibility', scores: { win: 5, mac: 4, lin: 3 }, notes: {
+          win: 'Largest library, including most games and business apps.',
+          mac: 'Great creative and developer apps; fewer games.',
+          lin: 'Huge open-source catalog; fewer commercial apps.' } },
+      { id: 'custom', label: 'Customization', scores: { win: 3, mac: 2, lin: 5 }, notes: {
+          win: 'Themes and settings, but core design stays fixed.',
+          mac: 'Limited by design to keep it consistent.',
+          lin: 'Change nearly everything, from desktop to kernel.' } },
+      { id: 'users', label: 'Intended users', text: {
+          win: 'General users, gamers, schools, and businesses.',
+          mac: 'Creatives, students, developers, and Apple device owners.',
+          lin: 'Developers, server admins, researchers, and hobbyists.' } }
+    ];
+
+    var showOS = {}, showCrit = {};
+    OS.forEach(function (o) { showOS[o.id] = true; });
+    CRITERIA.forEach(function (c) { showCrit[c.id] = true; });
+
+    function makeChips(containerId, items, state, label) {
+      var box = document.getElementById(containerId);
+      items.forEach(function (it) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'chip';
+        b.setAttribute('aria-pressed', 'true');
+        b.textContent = label(it);
+        b.addEventListener('click', function () {
+          state[it.id] = !state[it.id];
+          b.setAttribute('aria-pressed', state[it.id] ? 'true' : 'false');
+          renderTable();
+          renderCharts();
+        });
+        box.appendChild(b);
+      });
+    }
+
+    function activeOS() { return OS.filter(function (o) { return showOS[o.id]; }); }
+    function activeCrit() { return CRITERIA.filter(function (c) { return showCrit[c.id]; }); }
+
+    function renderTable() {
+      var t = document.getElementById('cmpTable');
+      var os = activeOS(), cr = activeCrit();
+      if (!os.length || !cr.length) {
+        t.innerHTML = '<tbody><tr><td>Select at least one operating system and one category.</td></tr></tbody>';
+        return;
+      }
+      var h = '<thead><tr><th>Category</th>';
+      os.forEach(function (o) { h += '<th><span class="dot" style="background:' + o.color + '"></span>' + o.name + '</th>'; });
+      h += '</tr></thead><tbody>';
+      cr.forEach(function (c) {
+        h += '<tr><th scope="row">' + c.label + '</th>';
+        os.forEach(function (o) {
+          if (c.scores) h += '<td><strong>' + c.scores[o.id] + '/5</strong><small>' + c.notes[o.id] + '</small></td>';
+          else h += '<td>' + c.text[o.id] + '</td>';
+        });
+        h += '</tr>';
+      });
+      t.innerHTML = h + '</tbody>';
+    }
+
+    function renderCharts() {
+      var box = document.getElementById('chartBox');
+      var os = activeOS();
+      var cr = activeCrit().filter(function (c) { return c.scores; });
+      if (!os.length || !cr.length) {
+        box.innerHTML = '<p>Select at least one operating system and one scored category (not just Intended users) to see charts.</p>';
+        return;
+      }
+      var h = '';
+      cr.forEach(function (c) {
+        h += '<div class="group"><h3>' + c.label + '</h3>';
+        os.forEach(function (o) {
+          var s = c.scores[o.id];
+          h += '<div class="barrow"><span>' + o.name + '</span><div class="track"><div class="fill" style="width:' + (s / 5 * 100) + '%;background:' + o.color + '"></div></div><span class="val">' + s + '/5</span></div>';
+        });
+        h += '</div>';
+      });
+      // Overall average
+      h += '<div class="group"><h3>Overall average (selected categories)</h3>';
+      os.forEach(function (o) {
+        var sum = 0;
+        cr.forEach(function (c) { sum += c.scores[o.id]; });
+        var avg = sum / cr.length;
+        h += '<div class="barrow"><span>' + o.name + '</span><div class="track"><div class="fill" style="width:' + (avg / 5 * 100) + '%;background:' + o.color + '"></div></div><span class="val">' + avg.toFixed(1) + '</span></div>';
+      });
+      box.innerHTML = h + '</div>';
+    }
+
+    // Best-match section
+    var scored = CRITERIA.filter(function (c) { return c.scores; });
+    var weights = {};
+    scored.forEach(function (c) { weights[c.id] = 3; });
+    var PRESETS = [
+      { name: 'Gamer', w: { security: 2, usability: 3, cost: 2, compat: 5, custom: 2 } },
+      { name: 'Developer', w: { security: 4, usability: 3, cost: 3, compat: 3, custom: 5 } },
+      { name: 'Creative', w: { security: 3, usability: 5, cost: 1, compat: 4, custom: 2 } },
+      { name: 'Student on a budget', w: { security: 3, usability: 4, cost: 5, compat: 3, custom: 2 } },
+      { name: 'Business', w: { security: 5, usability: 4, cost: 3, compat: 5, custom: 1 } }
+    ];
+
+    function buildSliders() {
+      var box = document.getElementById('sliders');
+      scored.forEach(function (c) {
+        var d = document.createElement('div');
+        d.innerHTML = '<label for="w_' + c.id + '">' + c.label + ': <span id="wv_' + c.id + '">3</span></label>' +
+          '<input type="range" id="w_' + c.id + '" min="0" max="5" step="1" value="3">';
+        box.appendChild(d);
+        d.querySelector('input').addEventListener('input', function (e) {
+          weights[c.id] = Number(e.target.value);
+          document.getElementById('wv_' + c.id).textContent = e.target.value;
+          renderMatch();
+        });
+      });
+      var pb = document.getElementById('presets');
+      PRESETS.forEach(function (p) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'chip';
+        b.textContent = p.name;
+        b.addEventListener('click', function () {
+          scored.forEach(function (c) {
+            weights[c.id] = p.w[c.id];
+            document.getElementById('w_' + c.id).value = p.w[c.id];
+            document.getElementById('wv_' + c.id).textContent = p.w[c.id];
+          });
+          renderMatch();
+        });
+        pb.appendChild(b);
+      });
+    }
+
+    function renderMatch() {
+      var total = 0;
+      scored.forEach(function (c) { total += weights[c.id]; });
+      var box = document.getElementById('matchBars');
+      var best = document.getElementById('best');
+      if (total === 0) {
+        box.innerHTML = '';
+        best.textContent = 'Raise at least one slider above 0 to see a result.';
+        return;
+      }
+      var results = OS.map(function (o) {
+        var sum = 0;
+        scored.forEach(function (c) { sum += weights[c.id] * c.scores[o.id]; });
+        return { o: o, pct: Math.round(sum / total / 5 * 100) };
+      }).sort(function (a, b) { return b.pct - a.pct; });
+      var h = '';
+      results.forEach(function (r) {
+        h += '<div class="barrow"><span>' + r.o.name + '</span><div class="track"><div class="fill" style="width:' + r.pct + '%;background:' + r.o.color + '"></div></div><span class="val">' + r.pct + '%</span></div>';
+      });
+      box.innerHTML = h;
+      if (results[0].pct === results[1].pct) {
+        best.textContent = 'Tie: ' + results[0].o.name + ' and ' + results[1].o.name + ' fit your priorities equally.';
+      } else {
+        best.textContent = 'Best match for your priorities: ' + results[0].o.name + '.';
+      }
+    }
+
+    makeChips('osChips', OS, showOS, function (o) { return o.name; });
+    makeChips('critChips', CRITERIA, showCrit, function (c) { return c.label; });
+    buildSliders();
+    renderTable();
+    renderCharts();
+    renderMatch();
+  </script>
+</body>
+</html>
