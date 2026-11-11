@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Module 3: Linux | OS Explorer</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .perm-table td, .perm-table th { text-align: center; }
+    .perm-table td:first-child, .perm-table th:first-child { text-align: left; }
+    .perm-out { font-size: 1.3rem; margin-top: 14px; }
+    .perm-out code { font-size: 1.3rem; padding: 4px 10px; }
+    input[type="checkbox"] { width: 20px; height: 20px; }
+  </style>
+</head>
+<body>
+  <header class="site">
+    <div class="bar">
+      <a class="brand" href="index.html">OS Explorer</a>
+      <nav aria-label="Main">
+        <a href="index.html">Home</a>
+        <a href="windows.html">Windows</a>
+        <a href="macos.html">macOS</a>
+        <a href="linux.html" aria-current="page">Linux</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="hero">
+      <h1>Module 3: Linux</h1>
+      <p>Linux is a free, open-source operating system kernel started by Linus Torvalds in 1991. Combined with GNU tools and other software, it powers servers, phones (Android), supercomputers, and many desktops.</p>
+    </div>
+
+    <section id="distros">
+      <h2>Linux distributions</h2>
+      <p>A distribution (distro) bundles the Linux kernel with a package manager, desktop, and default apps. Select one to learn more.</p>
+      <div class="tabs" role="tablist" aria-label="Distributions">
+        <button class="tab" role="tab" aria-selected="true" aria-controls="d1" id="td1">Ubuntu</button>
+        <button class="tab" role="tab" aria-selected="false" aria-controls="d2" id="td2">Debian</button>
+        <button class="tab" role="tab" aria-selected="false" aria-controls="d3" id="td3">Fedora</button>
+        <button class="tab" role="tab" aria-selected="false" aria-controls="d4" id="td4">Arch</button>
+        <button class="tab" role="tab" aria-selected="false" aria-controls="d5" id="td5">Linux Mint</button>
+        <button class="tab" role="tab" aria-selected="false" aria-controls="d6" id="td6">Kali</button>
+      </div>
+      <div class="card panel" role="tabpanel" id="d1" aria-labelledby="td1"><p>Beginner-friendly and very popular on desktops and cloud servers. Uses the <code>apt</code> package manager and has a large community and lots of documentation.</p></div>
+      <div class="card panel" role="tabpanel" id="d2" aria-labelledby="td2" hidden><p>Known for stability. Many other distros, including Ubuntu, are built on top of it. A common choice for servers.</p></div>
+      <div class="card panel" role="tabpanel" id="d3" aria-labelledby="td3" hidden><p>Sponsored by Red Hat. Ships newer software quickly and uses <code>dnf</code>. A good way to preview technology that later reaches enterprise Linux.</p></div>
+      <div class="card panel" role="tabpanel" id="d4" aria-labelledby="td4" hidden><p>Minimal and highly customizable. You build the system piece by piece, which teaches a lot but takes more effort. Uses <code>pacman</code>.</p></div>
+      <div class="card panel" role="tabpanel" id="d5" aria-labelledby="td5" hidden><p>Based on Ubuntu with a familiar, Windows-like desktop. Popular with people switching from Windows.</p></div>
+      <div class="card panel" role="tabpanel" id="d6" aria-labelledby="td6" hidden><p>Comes preloaded with tools for security testing and ethical hacking. Meant for professionals and students, not everyday use.</p></div>
+    </section>
+
+    <section id="opensource">
+      <h2>Open-source software</h2>
+      <div class="grid">
+        <div class="card"><h3>Open code</h3><p>Anyone can read, change, and share the source code, usually under licenses such as the GNU GPL.</p></div>
+        <div class="card"><h3>Free to use</h3><p>Most distributions and apps cost nothing, which suits schools, startups, and old computers.</p></div>
+        <div class="card"><h3>Community driven</h3><p>Thousands of volunteers and companies fix bugs and add features, so security problems are often found and patched quickly.</p></div>
+        <div class="card"><h3>Common apps</h3><p>Firefox, LibreOffice, GIMP, VLC, Blender, VS Code, and the Apache and Nginx web servers.</p></div>
+      </div>
+    </section>
+
+    <section id="terminal">
+      <h2>Terminal commands</h2>
+      <p>The terminal lets you control Linux by typing commands. It is fast, scriptable, and works the same over a remote connection.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Command</th><th>What it does</th></tr></thead>
+          <tbody>
+            <tr><td><code>pwd</code></td><td>Show the current folder</td></tr>
+            <tr><td><code>ls -l</code></td><td>List files with details and permissions</td></tr>
+            <tr><td><code>cd folder</code></td><td>Change folder</td></tr>
+            <tr><td><code>mkdir name</code></td><td>Create a folder</td></tr>
+            <tr><td><code>cp a b</code> / <code>mv a b</code></td><td>Copy or move/rename a file</td></tr>
+            <tr><td><code>rm file</code></td><td>Delete a file (no Recycle Bin)</td></tr>
+            <tr><td><code>cat file</code></td><td>Print a file's contents</td></tr>
+            <tr><td><code>grep word file</code></td><td>Search inside files</td></tr>
+            <tr><td><code>ps</code> / <code>top</code></td><td>Show running processes</td></tr>
+            <tr><td><code>sudo command</code></td><td>Run a command as administrator</td></tr>
+            <tr><td><code>sudo apt install name</code></td><td>Install software (Debian/Ubuntu)</td></tr>
+            <tr><td><code>man command</code></td><td>Open the manual for a command</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="permissions">
+      <h2>File permissions</h2>
+      <p>Every file has permissions for three groups: the <b>owner</b>, the <b>group</b>, and <b>others</b>. Each group can have read (r = 4), write (w = 2), and execute (x = 1). Add the numbers to get one digit, so read + write = 6. Try the calculator.</p>
+      <div class="card">
+        <div class="table-wrap">
+          <table class="perm-table">
+            <thead><tr><th>Who</th><th>Read (4)</th><th>Write (2)</th><th>Execute (1)</th></tr></thead>
+            <tbody>
+              <tr><td>Owner</td><td><input type="checkbox" aria-label="Owner read" data-g="0" data-v="4" checked></td><td><input type="checkbox" aria-label="Owner write" data-g="0" data-v="2" checked></td><td><input type="checkbox" aria-label="Owner execute" data-g="0" data-v="1" checked></td></tr>
+              <tr><td>Group</td><td><input type="checkbox" aria-label="Group read" data-g="1" data-v="4" checked></td><td><input type="checkbox" aria-label="Group write" data-g="1" data-v="2"></td><td><input type="checkbox" aria-label="Group execute" data-g="1" data-v="1" checked></td></tr>
+              <tr><td>Others</td><td><input type="checkbox" aria-label="Others read" data-g="2" data-v="4" checked></td><td><input type="checkbox" aria-label="Others write" data-g="2" data-v="2"></td><td><input type="checkbox" aria-label="Others execute" data-g="2" data-v="1" checked></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="perm-out" aria-live="polite">Command: <code id="permCmd"></code> &nbsp; Display: <code id="permSym"></code></p>
+        <p id="permNote" style="margin-top:10px"></p>
+      </div>
+      <p style="margin-top:12px">Use <code>chmod</code> to change permissions and <code>chown</code> to change the owner. Regular users cannot change system files, which is a big part of Linux security.</p>
+    </section>
+
+    <section id="custom">
+      <h2>Customization</h2>
+      <div class="grid">
+        <div class="card"><h3>Desktop environments</h3><p>GNOME, KDE Plasma, Xfce, and Cinnamon each look and work differently. You can switch without changing the rest of the system.</p></div>
+        <div class="card"><h3>Window managers</h3><p>Tools like i3 or Sway let advanced users control everything with the keyboard.</p></div>
+        <div class="card"><h3>Themes and icons</h3><p>Change colors, fonts, icons, and layouts to suit your taste.</p></div>
+        <div class="card"><h3>Shells and scripts</h3><p>Choose bash or zsh and automate tasks with shell scripts.</p></div>
+      </div>
+    </section>
+
+    <section id="servers">
+      <h2>Server applications</h2>
+      <p>Linux runs most web servers and cloud platforms, and all of the world's top supercomputers. It is stable, secure, and can run for long periods without rebooting.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Use</th><th>Examples</th></tr></thead>
+          <tbody>
+            <tr><td>Web servers</td><td>Apache, Nginx</td></tr>
+            <tr><td>Databases</td><td>MySQL, PostgreSQL, MongoDB</td></tr>
+            <tr><td>Containers and cloud</td><td>Docker, Kubernetes, AWS and Azure Linux machines</td></tr>
+            <tr><td>Remote access</td><td>SSH</td></tr>
+            <tr><td>File and mail sharing</td><td>Samba, Postfix</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="proscons">
+      <h2>Advantages and limitations</h2>
+      <div class="grid">
+        <div class="card pros">
+          <h3>Advantages</h3>
+          <ul class="clean">
+            <li>Free, open, and highly customizable</li>
+            <li>Strong security and few desktop viruses</li>
+            <li>Runs well on older hardware</li>
+            <li>The standard for servers and development</li>
+          </ul>
+        </div>
+        <div class="card cons">
+          <h3>Limitations</h3>
+          <ul class="clean">
+            <li>Steeper learning curve for beginners</li>
+            <li>Fewer commercial apps, such as Adobe and some games</li>
+            <li>Hardware driver support can vary</li>
+            <li>Many distros to choose from can be confusing</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="quiz">
+      <h2>Quick check</h2>
+      <div class="card">
+        <h3 id="quizQ"></h3>
+        <div id="quizOpts"></div>
+        <p id="quizResult" aria-live="polite"></p>
+        <p style="margin-top:12px"><button class="btn" id="quizNext" type="button">Next question</button></p>
+      </div>
+    </section>
+  </main>
+
+  <footer>Interactive Operating Systems Explorer &middot; Chapter 8</footer>
+  <script>
+    document.querySelectorAll('.tabs').forEach(function (list) {
+      var tabs = list.querySelectorAll('.tab');
+      tabs.forEach(function (tab) {
+        tab.addEventListener('click', function () {
+          tabs.forEach(function (t) {
+            var on = t === tab;
+            t.setAttribute('aria-selected', on ? 'true' : 'false');
+            document.getElementById(t.getAttribute('aria-controls')).hidden = !on;
+          });
+        });
+      });
+    });
+
+    // chmod calculator
+    var boxes = document.querySelectorAll('input[data-g]');
+    function updatePerms() {
+      var sums = [0, 0, 0];
+      var sym = '';
+      for (var g = 0; g < 3; g++) {
+        var r = 0, w = 0, x = 0;
+        boxes.forEach(function (b) {
+          if (Number(b.dataset.g) === g && b.checked) {
+            var v = Number(b.dataset.v);
+            sums[g] += v;
+            if (v === 4) r = 1; if (v === 2) w = 1; if (v === 1) x = 1;
+          }
+        });
+        sym += (r ? 'r' : '-') + (w ? 'w' : '-') + (x ? 'x' : '-');
+      }
+      var num = sums.join('');
+      document.getElementById('permCmd').textContent = 'chmod ' + num + ' file';
+      document.getElementById('permSym').textContent = '-' + sym;
+      var note = '';
+      if (num === '777') note = 'Everyone can read, write, and run this file. This is risky and rarely a good idea.';
+      else if (num === '755') note = 'Common for programs and folders: the owner can change it, everyone else can read and run it.';
+      else if (num === '644') note = 'Common for normal files: the owner can edit, everyone else can only read.';
+      else if (num === '600') note = 'Private: only the owner can read and write. Good for secret keys.';
+      else if (num === '000') note = 'Nobody has access.';
+      document.getElementById('permNote').textContent = note;
+    }
+    boxes.forEach(function (b) { b.addEventListener('change', updatePerms); });
+    updatePerms();
+
+    // Quiz
+    var questions = [
+      { q: 'Who started the Linux kernel in 1991?', o: ['Bill Gates', 'Steve Jobs', 'Linus Torvalds', 'Tim Cook'], a: 2 },
+      { q: 'Which command lists files with permissions?', o: ['ls -l', 'pwd', 'cd', 'mkdir'], a: 0 },
+      { q: 'What does chmod 644 give others?', o: ['Read only', 'Read and write', 'Full access', 'No access'], a: 0 },
+      { q: 'What is a Linux distribution?', o: ['A virus', 'A kernel bundled with software and a package manager', 'A type of terminal', 'A file system'], a: 1 }
+    ];
+    var i = 0;
+    var qEl = document.getElementById('quizQ');
+    var opts = document.getElementById('quizOpts');
+    var result = document.getElementById('quizResult');
+    function showQuestion() {
+      var item = questions[i];
+      qEl.textContent = item.q;
+      result.textContent = '';
+      opts.innerHTML = '';
+      item.o.forEach(function (text, idx) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'quiz-opt';
+        b.textContent = text;
+        b.addEventListener('click', function () {
+          var all = opts.querySelectorAll('.quiz-opt');
+          all.forEach(function (x) { x.disabled = true; });
+          all[item.a].classList.add('right');
+          if (idx === item.a) { result.textContent = 'Correct.'; }
+          else { b.classList.add('wrong'); result.textContent = 'Not quite. The right answer is highlighted.'; }
+        });
+        opts.appendChild(b);
+      });
+    }
+    document.getElementById('quizNext').addEventListener('click', function () {
+      i = (i + 1) % questions.length;
+      showQuestion();
+    });
+    showQuestion();
+  </script>
+</body>
+</html>
