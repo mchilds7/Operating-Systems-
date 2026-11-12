@@ -4,14 +4,17 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Interactive Operating Systems Explorer</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🖥️%3C/text%3E%3C/svg%3E">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+  <a class="skip" href="#main">Skip to content</a>
   <header class="site">
     <div class="bar">
       <a class="brand" href="index.html">OS Explorer</a>
       <nav aria-label="Main">
         <a href="index.html" aria-current="page">Home</a>
+        <a href="basics.html">Basics</a>
         <a href="windows.html">Windows</a>
         <a href="macos.html">macOS</a>
         <a href="linux.html">Linux</a>
@@ -23,54 +26,106 @@
     </div>
   </header>
 
-  <main>
+  <main id="main">
     <div class="hero">
-      <h1>Explore how operating systems work</h1>
-      <p>Learn what an operating system does, then dig into Windows, macOS, and Linux one module at a time.</p>
+      <h1>Explore how operating systems really work</h1>
+      <p>Learn what an operating system does, compare Windows, macOS, and Linux, get a personal recommendation, and try safe hands-on simulations, all in your browser.</p>
+      <div class="actions">
+        <a class="btn" href="basics.html">Start with the basics</a>
+        <a class="btn ghost" href="advisor.html">Find my best OS</a>
+      </div>
     </div>
 
     <section>
-      <h2>Modules</h2>
+      <p class="eyebrow">Learn</p>
+      <h2>The fundamentals</h2>
       <div class="grid">
-        <div class="card">
-          <h3>Module 1: Windows</h3>
-          <p>Features, strengths, weaknesses, common apps, file management, and security.</p>
-          <p style="margin-top:12px"><a class="btn" href="windows.html">Open Windows module</a></p>
-        </div>
-        <div class="card">
-          <h3>Module 2: macOS</h3>
-          <p>Interface, Apple hardware integration, software ecosystem, security, and limitations.</p>
-          <p style="margin-top:12px"><a class="btn" href="macos.html">Open macOS module</a></p>
-        </div>
-        <div class="card">
-          <h3>Module 3: Linux</h3>
+        <a class="card tile" href="basics.html">
+          <h3><span class="badge gen">OS</span> OS functions and architecture</h3>
+          <p>What an operating system does, how its layers fit together, kernel types, and how a computer boots.</p>
+          <span class="go">Open basics &rarr;</span>
+        </a>
+      </div>
+    </section>
+
+    <section>
+      <p class="eyebrow">Modules</p>
+      <h2>Meet the three operating systems</h2>
+      <div class="grid">
+        <a class="card tile" href="windows.html">
+          <h3><span class="badge win">W</span> Module 1: Windows</h3>
+          <p>Features, advantages, disadvantages, common applications, file management, and security.</p>
+          <span class="go">Open Windows &rarr;</span>
+        </a>
+        <a class="card tile" href="macos.html">
+          <h3><span class="badge mac">M</span> Module 2: macOS</h3>
+          <p>The interface, Apple hardware integration, software ecosystem, security, and limitations.</p>
+          <span class="go">Open macOS &rarr;</span>
+        </a>
+        <a class="card tile" href="linux.html">
+          <h3><span class="badge lin">L</span> Module 3: Linux</h3>
           <p>Distributions, open source, terminal commands, permissions, customization, and servers.</p>
-          <p style="margin-top:12px"><a class="btn" href="linux.html">Open Linux module</a></p>
-        </div>
-        <div class="card">
-          <h3>Module 4: Interactive comparison</h3>
-          <p>Compare all three side by side with filters, charts, and a best-match finder.</p>
-          <p style="margin-top:12px"><a class="btn" href="compare.html">Open comparison</a></p>
-        </div>
-        <div class="card">
-          <h3>Module 5: AI Assistant</h3>
-          <p>Ask questions, get a recommendation, and let the assistant control the site for you.</p>
-          <p style="margin-top:12px"><a class="btn" href="assistant.html">Open assistant</a></p>
-        </div>
-        <div class="card">
-          <h3>Original idea: OS Advisor</h3>
-          <p>Describe your needs and get a recommendation with reasons, trade-offs, and alternatives.</p>
-          <p style="margin-top:12px"><a class="btn" href="advisor.html">Open the advisor</a></p>
-        </div>
-        <div class="card">
-          <h3>OS Simulations</h3>
-          <p>Safe, hands-on demos: processes, memory, file system, permissions, a security quiz, and a terminal.</p>
-          <p style="margin-top:12px"><a class="btn" href="simulations.html">Open simulations</a></p>
-        </div>
+          <span class="go">Open Linux &rarr;</span>
+        </a>
+      </div>
+    </section>
+
+    <section>
+      <p class="eyebrow">Explore and decide</p>
+      <h2>Compare, ask, and get advice</h2>
+      <div class="grid">
+        <a class="card tile" href="compare.html">
+          <h3><span class="badge gen">4</span> Module 4: Interactive comparison</h3>
+          <p>A filterable table, charts, and a best-match finder for security, usability, cost, compatibility, customization, and users.</p>
+          <span class="go">Open comparison &rarr;</span>
+        </a>
+        <a class="card tile" href="assistant.html">
+          <h3><span class="badge gen">5</span> Module 5: OS Assistant</h3>
+          <p>A chatbot that answers questions, recommends an OS, and controls features of this website for you.</p>
+          <span class="go">Open assistant &rarr;</span>
+        </a>
+        <a class="card tile" href="advisor.html">
+          <h3><span class="badge gen">&#9733;</span> Original idea: OS Advisor</h3>
+          <p>Describe your needs and get a recommendation with reasons, trade-offs, alternatives, and a visible scoring table.</p>
+          <span class="go">Open the advisor &rarr;</span>
+        </a>
+      </div>
+    </section>
+
+    <section>
+      <p class="eyebrow">Practice</p>
+      <h2>Safe, hands-on simulations</h2>
+      <div class="grid">
+        <a class="card tile" href="simulations.html">
+          <h3><span class="badge gen">&#9881;</span> OS Simulations</h3>
+          <p>Process manager, memory allocation, file system explorer, user permissions, a security quiz, and a command-line terminal. Nothing touches your real computer.</p>
+          <span class="go">Open simulations &rarr;</span>
+        </a>
+      </div>
+    </section>
+
+    <section>
+      <p class="eyebrow">Project checklist</p>
+      <h2>What this project covers</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Learning objective</th><th>Where to find it</th></tr></thead>
+          <tbody>
+            <tr><td>Explain the functions and architecture of an operating system</td><td><a href="basics.html">OS Basics</a></td></tr>
+            <tr><td>Compare Windows, macOS, and Linux</td><td><a href="windows.html">Windows</a>, <a href="macos.html">macOS</a>, <a href="linux.html">Linux</a>, <a href="compare.html">Compare</a></td></tr>
+            <tr><td>Understand processes, memory, file systems, permissions, and security</td><td><a href="simulations.html">Simulations</a></td></tr>
+            <tr><td>Responsive website built with HTML, CSS, and JavaScript</td><td>Every page works on phones, tablets, and desktops, in light and dark mode</td></tr>
+            <tr><td>AI chatbot or agent that helps explore operating systems</td><td><a href="assistant.html">OS Assistant</a></td></tr>
+            <tr><td>An original idea beyond a static comparison page</td><td><a href="advisor.html">OS Advisor</a></td></tr>
+          </tbody>
+        </table>
       </div>
     </section>
   </main>
 
-  <footer>Interactive Operating Systems Explorer &middot; Chapter 8</footer>
+  <footer>
+    <p>Interactive Operating Systems Explorer &middot; Chapter 8 &ndash; Operating Systems</p>
+    <p><a href="basics.html">Basics</a><a href="compare.html">Compare</a><a href="assistant.html">Assistant</a><a href="advisor.html">Advisor</a><a href="simulations.html">Simulations</a></p>
+  </footer>
 </body>
 </html>

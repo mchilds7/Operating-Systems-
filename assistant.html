@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Module 5: AI Assistant | OS Explorer</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🖥️%3C/text%3E%3C/svg%3E">
   <link rel="stylesheet" href="styles.css">
   <style>
     #log { max-height: 55vh; min-height: 260px; overflow-y: auto; padding: 4px; }
@@ -23,11 +24,13 @@
   </style>
 </head>
 <body>
+  <a class="skip" href="#main">Skip to content</a>
   <header class="site">
     <div class="bar">
       <a class="brand" href="index.html">OS Explorer</a>
       <nav aria-label="Main">
         <a href="index.html">Home</a>
+        <a href="basics.html">Basics</a>
         <a href="windows.html">Windows</a>
         <a href="macos.html">macOS</a>
         <a href="linux.html">Linux</a>
@@ -39,7 +42,7 @@
     </div>
   </header>
 
-  <main>
+  <main id="main">
     <div class="hero">
       <h1>Module 5: OS Assistant</h1>
       <p>Ask questions about Windows, macOS, and Linux, get a personal recommendation, or tell the assistant to open pages and set up the interactive features for you.</p>
@@ -68,7 +71,10 @@
     </section>
   </main>
 
-  <footer>Interactive Operating Systems Explorer &middot; Chapter 8</footer>
+  <footer>
+    <p>Interactive Operating Systems Explorer &middot; Chapter 8 &ndash; Operating Systems</p>
+    <p><a href="basics.html">Basics</a><a href="compare.html">Compare</a><a href="assistant.html">Assistant</a><a href="advisor.html">Advisor</a><a href="simulations.html">Simulations</a></p>
+  </footer>
 
   <script>
     // ---------- Knowledge ----------
@@ -119,6 +125,7 @@
     };
 
     var GENERAL = [
+      { re: /user mode|kernel mode|system call|architecture|\blayers?\b|boot(ing)? (process|up)|how does (a |the )?(computer|pc) (boot|start)/, link: 'basics.html', a: "An OS is built in layers. Applications and the user interface run in user mode and make system calls to the kernel, which runs in kernel mode and uses device drivers to control the hardware. When a computer boots, firmware loads a bootloader, the bootloader loads the kernel, and the kernel starts system services and the login screen." },
       { re: /what is (an? )?(os|operating system)|what does (an? )?(os|operating system) do|define (os|operating system)/, a: "An operating system manages a computer's hardware and gives programs a safe way to use it. Its main jobs are running processes, managing memory, handling files, controlling devices, and enforcing security." },
       { re: /kernel/, a: "The kernel is the core of an OS. It talks to hardware, schedules processes, manages memory, and enforces permissions. Linux is a kernel, Windows uses the NT kernel, and macOS uses XNU." },
       { re: /process|multitask|schedul|task manager/, a: "A process is a running program. The OS scheduler gives each process short turns on the CPU, so many programs seem to run at once (multitasking). You can see processes in Task Manager on Windows, Activity Monitor on macOS, and top on Linux." },
@@ -235,7 +242,7 @@
       } else {
         var g = null;
         GENERAL.forEach(function (x) { if (!g && x.re.test(t)) g = x; });
-        if (g) { text = g.a; }
+        if (g) { text = g.a; if (g.link) actions.push({ label: 'Open the OS Basics page', url: g.link }); }
         else if (oss.length) {
           text = oss.map(function (o) { return (oss.length > 1 ? NAME[o] + ': ' : '') + A[o].overview; }).join('\n\n');
           if (oss.length > 1) text += '\n\nAsk about security, cost, software, gaming, or customization to compare them in detail.';
@@ -338,6 +345,8 @@
         autoOpen(label, 'compare.html#' + parts.join('&'));
         return true;
       }
+
+      if (/\bbasics?\b|fundamentals|architecture page/.test(t)) { autoOpen('the OS basics page', 'basics.html'); return true; }
 
       // plain navigation
       if (/\bhome\b/.test(t)) { autoOpen('the home page', 'index.html'); return true; }

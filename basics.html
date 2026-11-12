@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OS Basics: Functions and Architecture | OS Explorer</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🖥️%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .layers { display: grid; gap: 8px; margin: 12px 0; }
+    .layer { text-align: left; font: inherit; font-weight: 700; padding: 14px 18px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: transform .15s, border-color .15s; }
+    .layer:hover { transform: translateX(3px); border-color: var(--accent); }
+    .layer[aria-pressed="true"] { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: var(--on-accent); border-color: transparent; }
+    .layer small { font-weight: 500; opacity: .85; }
+    .split { display: grid; gap: 18px; grid-template-columns: 1fr 1.2fr; align-items: start; }
+    @media (max-width: 760px) { .split { grid-template-columns: 1fr; } }
+    .os3 { display: grid; gap: 10px; margin-top: 12px; }
+    .os3 div { border-left: 5px solid var(--line); padding: 4px 12px; }
+    .os3 .w { border-color: var(--win); } .os3 .m { border-color: var(--mac); } .os3 .l { border-color: var(--lin); }
+    ol.steps { counter-reset: s; list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
+    ol.steps li { counter-increment: s; position: relative; padding-left: 52px; }
+    ol.steps li::before { content: counter(s); position: absolute; left: 0; top: 0; width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: var(--on-accent); font-weight: 800; display: flex; align-items: center; justify-content: center; }
+    .msg { margin-top: 12px; padding: 10px 14px; border-radius: 10px; border-left: 5px solid var(--accent); background: var(--surface-2); }
+    .msg.ok { border-left-color: var(--good); } .msg.bad { border-left-color: var(--bad); }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site">
+    <div class="bar">
+      <a class="brand" href="index.html">OS Explorer</a>
+      <nav aria-label="Main">
+        <a href="index.html">Home</a>
+        <a href="basics.html" aria-current="page">Basics</a>
+        <a href="windows.html">Windows</a>
+        <a href="macos.html">macOS</a>
+        <a href="linux.html">Linux</a>
+        <a href="compare.html">Compare</a>
+        <a href="assistant.html">Assistant</a>
+        <a href="advisor.html">Advisor</a>
+        <a href="simulations.html">Simulations</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <div class="hero">
+      <h1>OS basics: functions and architecture</h1>
+      <p>An operating system (OS) is the software that manages a computer's hardware and lets programs run safely. Learn what it does and how it is built.</p>
+    </div>
+
+    <section id="what">
+      <p class="eyebrow">The big idea</p>
+      <h2>What is an operating system?</h2>
+      <p class="lead">Without an OS, every program would have to control the screen, disk, memory, and network by itself. The OS sits in the middle, shares the hardware fairly between programs, and keeps them from interfering with each other.</p>
+      <div class="grid">
+        <div class="card"><h3>Applications</h3><p>Browsers, games, and editors. They ask the OS for what they need instead of touching hardware directly.</p></div>
+        <div class="card"><h3>Operating system</h3><p>The manager. It schedules the CPU, hands out memory, organizes files, runs drivers, and enforces security.</p></div>
+        <div class="card"><h3>Hardware</h3><p>The CPU, RAM, storage, display, and network card that actually do the work.</p></div>
+      </div>
+    </section>
+
+    <section id="functions">
+      <p class="eyebrow">Functions</p>
+      <h2>What the OS does</h2>
+      <div class="grid">
+        <div class="card"><h3>Process management</h3><p>Starts, schedules, and stops programs, and shares CPU time so many run at once.</p><p style="margin-top:10px"><a href="simulations.html#tab=processes">Try the process simulation &rarr;</a></p></div>
+        <div class="card"><h3>Memory management</h3><p>Gives each program its own memory, tracks what is free, and uses disk space as virtual memory when RAM is full.</p><p style="margin-top:10px"><a href="simulations.html#tab=memory">Try the memory simulation &rarr;</a></p></div>
+        <div class="card"><h3>File system management</h3><p>Stores data in files and folders, tracks where it lives on disk, and controls who can open it.</p><p style="margin-top:10px"><a href="simulations.html#tab=files">Try the file explorer &rarr;</a></p></div>
+        <div class="card"><h3>Device management</h3><p>Uses drivers to talk to printers, keyboards, graphics cards, and other devices in a standard way.</p></div>
+        <div class="card"><h3>Security and access control</h3><p>Uses accounts, permissions, and isolation to protect data and keep one program from harming another.</p><p style="margin-top:10px"><a href="simulations.html#tab=perms">Try the permissions demo &rarr;</a></p></div>
+        <div class="card"><h3>User interface</h3><p>Provides the desktop and windows (graphical) or a shell (command line) so people can use the computer.</p><p style="margin-top:10px"><a href="simulations.html#tab=terminal">Try the terminal &rarr;</a></p></div>
+      </div>
+    </section>
+
+    <section id="architecture">
+      <p class="eyebrow">Architecture</p>
+      <h2>The layers of an operating system</h2>
+      <p class="lead">Select a layer to see what it does and how Windows, macOS, and Linux build it.</p>
+      <div class="split">
+        <div class="layers" id="layers" role="group" aria-label="OS layers"></div>
+        <div class="card" id="layerInfo" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <section id="modes">
+      <p class="eyebrow">Protection</p>
+      <h2>User mode, kernel mode, and system calls</h2>
+      <div class="grid">
+        <div class="card"><h3>User mode</h3><p>Where normal applications run. They have limited rights, so a crashing app cannot take down the whole system.</p></div>
+        <div class="card"><h3>Kernel mode</h3><p>Where the kernel and drivers run with full access to hardware. Only trusted code runs here.</p></div>
+      </div>
+      <h3 style="margin-top:24px">Example: an app opens a file</h3>
+      <ol class="steps card">
+        <li><strong>The app makes a system call</strong> (such as open) because it cannot touch the disk directly.</li>
+        <li><strong>The CPU switches to kernel mode</strong> and the kernel takes over.</li>
+        <li><strong>The kernel checks permissions.</strong> If the user is not allowed, the call fails with "permission denied".</li>
+        <li><strong>A driver reads the disk</strong> through the file system code.</li>
+        <li><strong>The result returns to the app</strong> and the CPU goes back to user mode.</li>
+      </ol>
+    </section>
+
+    <section id="kernels">
+      <p class="eyebrow">Design choices</p>
+      <h2>Types of kernels</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Type</th><th>How it works</th><th>Examples</th><th>Trade-off</th></tr></thead>
+          <tbody>
+            <tr><td>Monolithic</td><td>Most OS services run together inside the kernel.</td><td>Linux (with loadable modules)</td><td>Fast, but a bug in a driver can crash the system.</td></tr>
+            <tr><td>Microkernel</td><td>Only the essentials are in the kernel. Other services run in user mode.</td><td>QNX, Minix, seL4</td><td>More isolation, but more message passing.</td></tr>
+            <tr><td>Hybrid</td><td>A mix: a microkernel-style design with many services kept in the kernel for speed.</td><td>Windows NT, macOS (XNU)</td><td>Balances speed and structure.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="boot">
+      <p class="eyebrow">Start-up</p>
+      <h2>How a computer boots</h2>
+      <ol class="steps card">
+        <li><strong>Power on.</strong> The processor starts running firmware (UEFI on most PCs, Apple's boot ROM on Macs).</li>
+        <li><strong>Hardware check.</strong> The firmware tests basic hardware and finds the startup disk.</li>
+        <li><strong>Bootloader.</strong> A small program loads the kernel into memory (Windows Boot Manager, GRUB on many Linux systems, iBoot on Macs).</li>
+        <li><strong>Kernel starts.</strong> It sets up memory, loads drivers, and mounts the file system.</li>
+        <li><strong>System services start.</strong> A first process (such as systemd on Linux or launchd on macOS) starts the background services.</li>
+        <li><strong>Login.</strong> The login screen appears and your desktop loads.</li>
+      </ol>
+    </section>
+
+    <section id="check">
+      <p class="eyebrow">Quick check</p>
+      <h2>Test yourself</h2>
+      <div class="card">
+        <h3 id="qText"></h3>
+        <div id="qOpts"></div>
+        <div class="msg" id="qFb" hidden aria-live="polite"></div>
+        <p style="margin-top:14px"><button class="btn" id="qNext" type="button" hidden>Next question</button></p>
+      </div>
+    </section>
+
+    <section>
+      <div class="card" style="text-align:center">
+        <h2>Ready to compare the real thing?</h2>
+        <p style="margin-bottom:16px">Continue with the three operating systems.</p>
+        <a class="btn" href="windows.html">Start with Windows</a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>Interactive Operating Systems Explorer &middot; Chapter 8 &ndash; Operating Systems</p>
+    <p><a href="basics.html">Basics</a><a href="compare.html">Compare</a><a href="assistant.html">Assistant</a><a href="advisor.html">Advisor</a><a href="simulations.html">Simulations</a></p>
+  </footer>
+
+  <script>
+    var LAYERS = [
+      { n: 'Applications', s: 'User mode', d: 'The programs people use: browsers, games, office tools, and editors. They request services from the OS through its programming interface.',
+        w: 'Win32 and modern Windows apps, plus Microsoft Office and most PC games.', m: 'Apps built with Apple frameworks, such as Safari, Final Cut Pro, and Xcode.', l: 'Open-source apps like Firefox and LibreOffice, plus Steam games.' },
+      { n: 'User interface and shell', s: 'User mode', d: 'How people control the computer: a graphical desktop or a command-line shell that turns what you do into requests.',
+        w: 'Windows shell (File Explorer, Start menu), Command Prompt, and PowerShell.', m: 'The Aqua desktop, Finder, and the zsh shell in Terminal.', l: 'Desktop environments like GNOME and KDE, and shells like bash and zsh.' },
+      { n: 'System call interface (API)', s: 'The boundary', d: 'The controlled doorway between applications and the kernel. Apps ask for things like opening a file or creating a process here.',
+        w: 'The Windows API (Win32) sits on top of native NT system calls.', m: 'POSIX calls plus Apple frameworks that lead into the XNU kernel.', l: 'POSIX system calls, usually reached through the C library (glibc).' },
+      { n: 'Kernel', s: 'Kernel mode', d: 'The core of the OS. It schedules processes, manages memory, handles the file system, and enforces permissions.',
+        w: 'The NT kernel, a hybrid design.', m: 'XNU, a hybrid of the Mach microkernel and BSD Unix.', l: 'The Linux kernel, a monolithic design with loadable modules.' },
+      { n: 'Device drivers', s: 'Kernel mode (mostly)', d: 'Translators between the kernel and specific hardware such as graphics cards, disks, and network adapters.',
+        w: 'Windows drivers, which are usually signed by the vendor and Microsoft.', m: 'Kernel extensions are being replaced by DriverKit, which runs drivers outside the kernel.', l: 'Many drivers are kernel modules that ship with the kernel itself.' },
+      { n: 'Hardware', s: 'Physical', d: 'The CPU, memory, storage, graphics, and network devices. The OS hides their differences so programs do not need to know the exact parts.',
+        w: 'Runs on PCs from many manufacturers, on both x86 and Arm.', m: 'Runs only on Apple hardware, now built on Apple silicon.', l: 'Runs on almost anything, from phones and servers to supercomputers.' }
+    ];
+    var box = document.getElementById('layers'), info = document.getElementById('layerInfo');
+    function showLayer(i) {
+      var L = LAYERS[i];
+      box.querySelectorAll('.layer').forEach(function (b, k) { b.setAttribute('aria-pressed', k === i ? 'true' : 'false'); });
+      info.innerHTML = '<h3>' + L.n + '</h3><p>' + L.d + '</p><div class="os3"><div class="w"><strong>Windows:</strong> ' + L.w + '</div><div class="m"><strong>macOS:</strong> ' + L.m + '</div><div class="l"><strong>Linux:</strong> ' + L.l + '</div></div>';
+    }
+    LAYERS.forEach(function (L, i) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'layer'; b.setAttribute('aria-pressed', 'false');
+      b.innerHTML = '<span>' + L.n + '</span><small>' + L.s + '</small>';
+      b.addEventListener('click', function () { showLayer(i); });
+      box.appendChild(b);
+    });
+    showLayer(3);
+
+    var QZ = [
+      { q: 'Which part of the OS decides which program uses the CPU next?', o: ['The scheduler in the kernel', 'The web browser', 'The printer driver', 'The desktop wallpaper'], a: 0, e: 'The kernel scheduler shares CPU time between processes.' },
+      { q: 'Why do applications use system calls?', o: ['To change their color theme', 'To ask the kernel to do things they are not allowed to do themselves', 'To make the CPU faster', 'To avoid using memory'], a: 1, e: 'System calls are the controlled way for apps to request protected services.' },
+      { q: 'Which kernel design does Linux use?', o: ['Microkernel', 'Monolithic with loadable modules', 'No kernel', 'Hybrid like Windows'], a: 1, e: 'Linux is monolithic, though it can load and unload modules.' },
+      { q: 'What does virtual memory do?', o: ['Uses disk space to extend RAM', 'Makes the screen larger', 'Encrypts the disk', 'Speeds up the network'], a: 0, e: 'Virtual memory moves less-used data to disk so more programs can run.' }
+    ];
+    var qi = 0, score = 0;
+    function showQ() {
+      var q = QZ[qi];
+      document.getElementById('qText').textContent = (qi + 1) + '/' + QZ.length + '  ' + q.q;
+      var o = document.getElementById('qOpts'); o.innerHTML = '';
+      document.getElementById('qFb').hidden = true;
+      document.getElementById('qNext').hidden = true;
+      q.o.forEach(function (t, i) {
+        var b = document.createElement('button');
+        b.type = 'button'; b.className = 'quiz-opt'; b.textContent = t;
+        b.addEventListener('click', function () {
+          var all = o.querySelectorAll('.quiz-opt'); all.forEach(function (x) { x.disabled = true; });
+          all[q.a].classList.add('right');
+          var f = document.getElementById('qFb'); f.hidden = false;
+          if (i === q.a) { score++; f.className = 'msg ok'; f.textContent = 'Correct. ' + q.e; }
+          else { b.classList.add('wrong'); f.className = 'msg bad'; f.textContent = 'Not quite. ' + q.e; }
+          var n = document.getElementById('qNext'); n.hidden = false; n.textContent = qi + 1 < QZ.length ? 'Next question' : 'See my score';
+        });
+        o.appendChild(b);
+      });
+    }
+    document.getElementById('qNext').addEventListener('click', function () {
+      if (qi >= QZ.length) { qi = 0; score = 0; showQ(); return; }
+      qi++;
+      if (qi < QZ.length) { showQ(); return; }
+      document.getElementById('qText').textContent = 'You scored ' + score + ' out of ' + QZ.length + '.';
+      document.getElementById('qOpts').innerHTML = '';
+      document.getElementById('qFb').hidden = true;
+      this.textContent = 'Try again';
+    });
+    showQ();
+  </script>
+</body>
+</html>

@@ -4,14 +4,17 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Module 2: macOS | OS Explorer</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🖥️%3C/text%3E%3C/svg%3E">
   <link rel="stylesheet" href="styles.css">
 </head>
-<body>
+<body class="os-mac">
+  <a class="skip" href="#main">Skip to content</a>
   <header class="site">
     <div class="bar">
       <a class="brand" href="index.html">OS Explorer</a>
       <nav aria-label="Main">
         <a href="index.html">Home</a>
+        <a href="basics.html">Basics</a>
         <a href="windows.html">Windows</a>
         <a href="macos.html" aria-current="page">macOS</a>
         <a href="linux.html">Linux</a>
@@ -23,7 +26,7 @@
     </div>
   </header>
 
-  <main>
+  <main id="main">
     <div class="hero">
       <h1>Module 2: macOS</h1>
       <p>macOS is Apple's operating system for Mac computers. It is built on a Unix foundation and designed to run only on Apple hardware, which lets Apple tune the software and the machine together.</p>
@@ -124,7 +127,10 @@
     </section>
   </main>
 
-  <footer>Interactive Operating Systems Explorer &middot; Chapter 8</footer>
+  <footer>
+    <p>Interactive Operating Systems Explorer &middot; Chapter 8 &ndash; Operating Systems</p>
+    <p><a href="basics.html">Basics</a><a href="compare.html">Compare</a><a href="assistant.html">Assistant</a><a href="advisor.html">Advisor</a><a href="simulations.html">Simulations</a></p>
+  </footer>
   <script>
     document.querySelectorAll('.tabs').forEach(function (list) {
       var tabs = list.querySelectorAll('.tab');

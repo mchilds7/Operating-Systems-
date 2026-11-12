@@ -4,14 +4,17 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Module 1: Windows | OS Explorer</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🖥️%3C/text%3E%3C/svg%3E">
   <link rel="stylesheet" href="styles.css">
 </head>
-<body>
+<body class="os-win">
+  <a class="skip" href="#main">Skip to content</a>
   <header class="site">
     <div class="bar">
       <a class="brand" href="index.html">OS Explorer</a>
       <nav aria-label="Main">
         <a href="index.html">Home</a>
+        <a href="basics.html">Basics</a>
         <a href="windows.html" aria-current="page">Windows</a>
         <a href="macos.html">macOS</a>
         <a href="linux.html">Linux</a>
@@ -23,7 +26,7 @@
     </div>
   </header>
 
-  <main>
+  <main id="main">
     <div class="hero">
       <h1>Module 1: Windows</h1>
       <p>Windows is Microsoft's operating system and the most widely used desktop OS in the world. First released in 1985, it runs on PCs, laptops, tablets, and servers.</p>
@@ -133,7 +136,10 @@
     </section>
   </main>
 
-  <footer>Interactive Operating Systems Explorer &middot; Chapter 8</footer>
+  <footer>
+    <p>Interactive Operating Systems Explorer &middot; Chapter 8 &ndash; Operating Systems</p>
+    <p><a href="basics.html">Basics</a><a href="compare.html">Compare</a><a href="assistant.html">Assistant</a><a href="advisor.html">Advisor</a><a href="simulations.html">Simulations</a></p>
+  </footer>
   <script>
 // Tabs (used on windows.html)
 document.querySelectorAll('.tabs').forEach(function (tabList) {

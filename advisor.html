@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>OS Advisor | OS Explorer</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🖥️%3C/text%3E%3C/svg%3E">
   <link rel="stylesheet" href="styles.css">
   <style>
     .step { display: inline-block; background: var(--accent); color: #fff; border-radius: 999px; padding: 2px 12px; font-size: 0.85rem; font-weight: 700; margin-bottom: 6px; }
@@ -32,11 +33,13 @@
   </style>
 </head>
 <body>
+  <a class="skip" href="#main">Skip to content</a>
   <header class="site">
     <div class="bar">
       <a class="brand" href="index.html">OS Explorer</a>
       <nav aria-label="Main">
         <a href="index.html">Home</a>
+        <a href="basics.html">Basics</a>
         <a href="windows.html">Windows</a>
         <a href="macos.html">macOS</a>
         <a href="linux.html">Linux</a>
@@ -48,7 +51,7 @@
     </div>
   </header>
 
-  <main>
+  <main id="main">
     <div class="hero">
       <h1>AI Operating System Advisor</h1>
       <p>Describe what you need and get a recommendation with the reasons, the trade-offs, and the alternatives. No operating system is best for everyone, so this advisor shows its math.</p>
@@ -106,6 +109,7 @@
           <label><input type="checkbox" value="apple"> I use an iPhone / Apple devices</label>
         </div>
         <button class="btn" id="go" type="button">Get my recommendation</button>
+        <p id="needMsg" role="alert" style="color:var(--bad);margin-top:10px"></p>
       </div>
     </section>
 
@@ -141,7 +145,10 @@
     </section>
   </main>
 
-  <footer>Interactive Operating Systems Explorer &middot; Chapter 8</footer>
+  <footer>
+    <p>Interactive Operating Systems Explorer &middot; Chapter 8 &ndash; Operating Systems</p>
+    <p><a href="basics.html">Basics</a><a href="compare.html">Compare</a><a href="assistant.html">Assistant</a><a href="advisor.html">Advisor</a><a href="simulations.html">Simulations</a></p>
+  </footer>
 
   <script>
     // Optional: set this to the URL of YOUR OWN server or serverless function that holds an AI API key.
@@ -424,8 +431,10 @@
         if (p.hw) req.hw = p.hw;
         writeForm(req);
       }
+      var nm = document.getElementById('needMsg');
+      nm.textContent = '';
       if (!req.needs.length && !req.budget && !req.exp && !req.hw) {
-        alert('Please describe what you need or choose at least one option.');
+        nm.textContent = 'Please describe what you need or choose at least one option.';
         return;
       }
       render(req);
