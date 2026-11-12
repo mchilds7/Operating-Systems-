@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OS Simulations | OS Explorer</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0; }
+    .chip { background: var(--surface); color: var(--ink); border: 1px solid var(--line); padding: 7px 14px; border-radius: 999px; cursor: pointer; font-size: 0.95rem; }
+    .chip[aria-pressed="true"] { background: var(--accent); color: #fff; border-color: var(--accent); }
+    @media (prefers-color-scheme: dark) { .chip[aria-pressed="true"] { color: #0b1420; } }
+    .small { color: var(--muted); font-size: 0.92rem; }
+    .ctl { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 12px 0; }
+    select, input[type="text"], input[type="number"] { padding: 8px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); color: var(--ink); font-size: 1rem; font-family: inherit; }
+    .btn.sec { background: var(--surface); color: var(--ink); border: 1px solid var(--line); }
+    .btn.sec:hover { border-color: var(--accent); background: var(--surface); }
+    .btn.sm, .tab.sm { padding: 4px 10px; font-size: 0.88rem; }
+    .btn.danger { background: var(--bad); color: #fff; }
+    .bar-track { background: var(--bg); border: 1px solid var(--line); border-radius: 4px; height: 22px; overflow: hidden; }
+    .bar-fill { height: 100%; background: var(--accent); transition: width .4s; }
+    .stats { display: flex; flex-wrap: wrap; gap: 8px 24px; margin: 8px 0; }
+    .msg { margin-top: 10px; padding: 10px 14px; border-radius: 6px; border-left: 5px solid var(--accent); background: var(--bg); min-height: 1.5em; }
+    .msg.ok { border-left-color: var(--good); }
+    .msg.bad { border-left-color: var(--bad); }
+    .msg.warn { border-left-color: #d9a21b; }
+    .grid-mem { display: grid; grid-template-columns: repeat(16, 1fr); gap: 3px; margin: 12px 0; }
+    .cell { aspect-ratio: 1; border-radius: 3px; border: 1px solid var(--line); background: var(--bg); font-size: 0.7rem; display: flex; align-items: center; justify-content: center; color: #fff; overflow: hidden; }
+    .term { background: #0d1117; color: #d7e3f0; font-family: Consolas, Menlo, monospace; font-size: 0.92rem; border-radius: 8px; padding: 12px; height: 340px; overflow-y: auto; cursor: text; }
+    .term div { white-space: pre-wrap; word-break: break-word; }
+    .term .in { color: #7ee787; }
+    .term .err { color: #ff8a7d; }
+    .term input { background: transparent; border: 0; color: #d7e3f0; font: inherit; width: 60%; min-width: 120px; outline: none; padding: 0; }
+    .perm-boxes { display: grid; grid-template-columns: repeat(4, auto); gap: 6px 14px; width: max-content; margin-top: 8px; }
+    .perm-boxes input { width: 18px; height: 18px; }
+    pre.view { background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 10px; white-space: pre-wrap; margin-top: 10px; }
+    .hl { background: rgba(11, 107, 203, 0.14); }
+    td button { margin-right: 4px; }
+    .opt { display: block; width: 100%; text-align: left; margin-top: 8px; background: var(--bg); color: var(--ink); border: 1px solid var(--line); padding: 10px 12px; border-radius: 6px; cursor: pointer; font-size: 1rem; }
+    .opt:hover { border-color: var(--accent); }
+    .opt.right { border-color: var(--good); background: rgba(30, 122, 76, .15); }
+    .opt.wrong { border-color: var(--bad); background: rgba(179, 55, 43, .15); }
+    h2.sim { margin-top: 0; }
+  </style>
+</head>
+<body>
+  <header class="site">
+    <div class="bar">
+      <a class="brand" href="index.html">OS Explorer</a>
+      <nav aria-label="Main">
+        <a href="index.html">Home</a>
+        <a href="windows.html">Windows</a>
+        <a href="macos.html">macOS</a>
+        <a href="linux.html">Linux</a>
+        <a href="compare.html">Compare</a>
+        <a href="assistant.html">Assistant</a>
+        <a href="advisor.html">Advisor</a>
+        <a href="simulations.html" aria-current="page">Simulations</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="hero">
+      <h1>Operating System Simulations</h1>
+      <p>Safe, browser-based simulations of how an operating system works. Nothing here touches your real computer or files.</p>
+    </div>
+
+    <section>
+      <div class="card">
+        <strong>Log in as:</strong>
+        <div class="chips" id="userBtns" role="group" aria-label="Choose a user"></div>
+        <p class="small" id="userNote"></p>
+        <p class="small">Your choice applies to every simulation: it decides which processes you can end, which files you can open, and what the terminal lets you do.</p>
+      </div>
+    </section>
+
+    <section id="sims">
+      <div class="tabs" role="tablist" aria-label="Simulations" id="simTabs">
+        <button class="tab" role="tab" id="tab-processes" aria-controls="sim-processes" aria-selected="true">Processes</button>
+        <button class="tab" role="tab" id="tab-memory" aria-controls="sim-memory" aria-selected="false">Memory</button>
+        <button class="tab" role="tab" id="tab-files" aria-controls="sim-files" aria-selected="false">File system</button>
+        <button class="tab" role="tab" id="tab-perms" aria-controls="sim-perms" aria-selected="false">User permissions</button>
+        <button class="tab" role="tab" id="tab-quiz" aria-controls="sim-quiz" aria-selected="false">Security quiz</button>
+        <button class="tab" role="tab" id="tab-terminal" aria-controls="sim-terminal" aria-selected="false">Terminal</button>
+      </div>
+
+      <!-- PROCESSES -->
+      <div class="card panel" role="tabpanel" id="sim-processes" aria-labelledby="tab-processes">
+        <h2 class="sim">Process management</h2>
+        <p>A process is a running program. The OS shares the CPU between them. Start programs, watch CPU usage change, and try to end a process.</p>
+        <div class="stats"><span><strong>Total CPU:</strong> <span id="cpuTotal"></span></span><span><strong>Processes:</strong> <span id="procCount"></span></span><span><strong>System feels:</strong> <span id="feel"></span></span></div>
+        <div class="bar-track" aria-hidden="true"><div class="bar-fill" id="cpuBar" style="width:0"></div></div>
+        <div class="ctl">
+          <label for="catalog" class="small">New program:</label>
+          <select id="catalog"></select>
+          <button class="btn" type="button" id="startProc">Start</button>
+          <button class="btn sec" type="button" id="runaway">Simulate a runaway process</button>
+          <button class="btn sec" type="button" id="pauseProc">Pause updates</button>
+        </div>
+        <div class="table-wrap"><table id="procTable"></table></div>
+        <div class="msg" id="procMsg" aria-live="polite">Click End on a process to terminate it.</div>
+      </div>
+
+      <!-- MEMORY -->
+      <div class="card panel" role="tabpanel" id="sim-memory" aria-labelledby="tab-memory" hidden>
+        <h2 class="sim">Memory management</h2>
+        <p>The OS gives each program its own part of RAM. This simulated RAM has 64 blocks (16 MB each). Allocate programs, free them, and watch free space break into pieces.</p>
+        <div class="ctl">
+          <input type="text" id="mName" value="My Program" maxlength="16" aria-label="Program name" size="14">
+          <label class="small" for="mSize">Blocks:</label>
+          <input type="number" id="mSize" min="1" max="32" value="6" style="width:72px">
+          <select id="mStrat" aria-label="Allocation strategy"><option value="first">First fit</option><option value="best">Best fit</option></select>
+          <button class="btn" type="button" id="mAlloc">Allocate</button>
+          <button class="btn sec" type="button" id="mCompact">Compact memory</button>
+          <button class="btn sec" type="button" id="mDemo">Load fragmentation demo</button>
+          <button class="btn sec" type="button" id="mReset">Reset</button>
+        </div>
+        <div class="grid-mem" id="memGrid" role="img" aria-label="Memory map"></div>
+        <div class="stats"><span><strong>Used:</strong> <span id="mUsed"></span></span><span><strong>Free blocks:</strong> <span id="mFree"></span></span><span><strong>Largest free gap:</strong> <span id="mLargest"></span></span></div>
+        <div class="msg" id="memMsg" aria-live="polite">First fit uses the first gap that is big enough. Best fit uses the smallest gap that fits.</div>
+        <div class="table-wrap" style="margin-top:12px"><table id="memTable"></table></div>
+      </div>
+
+      <!-- FILES -->
+      <div class="card panel" role="tabpanel" id="sim-files" aria-labelledby="tab-files" hidden>
+        <h2 class="sim">File system explorer</h2>
+        <p>A simulated file system with folders, files, owners, and permissions (r = read, w = write, x = enter or run). Switch users above and see what changes.</p>
+        <div class="ctl"><strong>Location:</strong> <code id="exPath">/</code> <button class="btn sec sm" type="button" id="exUp">Up one level</button> <button class="btn sec sm" type="button" id="exReset">Reset files</button></div>
+        <div class="table-wrap"><table id="exTable"></table></div>
+        <div class="ctl">
+          <input type="text" id="newName" placeholder="new name" maxlength="24" aria-label="New file or folder name">
+          <button class="btn sec sm" type="button" id="newFolder">New folder</button>
+          <button class="btn sec sm" type="button" id="newFile">New file</button>
+        </div>
+        <div id="exDetail"></div>
+        <div class="msg" id="exMsg" aria-live="polite">Click a folder name to open it.</div>
+      </div>
+
+      <!-- PERMISSIONS -->
+      <div class="card panel" role="tabpanel" id="sim-perms" aria-labelledby="tab-perms" hidden>
+        <h2 class="sim">User permissions</h2>
+        <p>Operating systems give different accounts different power. This is called the principle of least privilege: use the lowest level that gets the job done. Try each action as the user chosen above.</p>
+        <div class="table-wrap"><table id="permTable"></table></div>
+        <div class="msg" id="permMsg" aria-live="polite">Click "Try it" on an action.</div>
+      </div>
+
+      <!-- QUIZ -->
+      <div class="card panel" role="tabpanel" id="sim-quiz" aria-labelledby="tab-quiz" hidden>
+        <h2 class="sim">Security quiz</h2>
+        <p class="small" id="qProgress"></p>
+        <h3 id="qText"></h3>
+        <div id="qOpts"></div>
+        <div class="msg" id="qFeedback" aria-live="polite" hidden></div>
+        <p style="margin-top:12px"><button class="btn" type="button" id="qNext" hidden>Next</button></p>
+      </div>
+
+      <!-- TERMINAL -->
+      <div class="card panel" role="tabpanel" id="sim-terminal" aria-labelledby="tab-terminal" hidden>
+        <h2 class="sim">Command-line terminal</h2>
+        <p>A safe, simulated terminal. It works on the same files and processes as the other simulations. Type <code>help</code> to see the commands.</p>
+        <div class="term" id="term" aria-label="Simulated terminal">
+          <div id="termOut"></div>
+          <div><span class="in" id="termPrompt"></span> <input type="text" id="termIn" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Terminal command"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>Interactive Operating Systems Explorer &middot; Chapter 8</footer>
+
+  <script>
+    /* ===================== Users (shared) ===================== */
+    var USERS = {
+      admin: { label: 'Administrator', groups: ['admin', 'users', 'guests'], root: true, note: 'Administrator: full control of the system. Powerful, but one mistake can damage the OS.' },
+      sam: { label: 'Standard user', groups: ['users'], root: false, note: 'Standard user (sam): can manage their own files and apps. System changes need an administrator.' },
+      guest: { label: 'Restricted guest', groups: ['guests'], root: false, note: 'Restricted guest: can only view public items and run a few approved apps.' }
+    };
+    var cur = 'sam';
+    var userHooks = [];
+    function setUser(u) {
+      cur = u;
+      document.querySelectorAll('#userBtns .chip').forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-u') === u ? 'true' : 'false'); });
+      document.getElementById('userNote').textContent = USERS[u].note;
+      userHooks.forEach(function (f) { f(); });
+    }
+    function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+    function setMsg(id, text, kind) { var e = document.getElementById(id); e.textContent = text; e.className = 'msg' + (kind ? ' ' + kind : ''); }
+
+    /* ===================== Processes ===================== */
+    var CATALOG = [
+      { n: 'Web Browser', c: 15, m: 480, g: true }, { n: 'Text Editor', c: 3, m: 90, g: true },
+      { n: 'Video Editor', c: 35, m: 900, g: false }, { n: 'Game', c: 50, m: 1200, g: false }, { n: 'Backup Tool', c: 12, m: 200, g: false }
+    ];
+    var procs = [], nextPid = 1000, paused = false;
+    function addProc(n, owner, c, m, crit, pid) { var p = { pid: pid || nextPid++, n: n, owner: owner, crit: !!crit, base: c, cpu: c, mem: m }; procs.push(p); return p; }
+    function initProcs() {
+      procs = []; nextPid = 1000;
+      addProc('kernel_task', 'admin', 2, 180, true, 1);
+      addProc('System', 'admin', 1, 60, true, 4);
+      addProc('Security Service', 'admin', 4, 210, false, 212);
+      addProc('Web Browser', 'sam', 18, 520, false, 530);
+      addProc('Music Player', 'sam', 6, 140, false, 611);
+      addProc('Guest Browser', 'guest', 8, 300, false, 702);
+    }
+    function killProc(pid, u) {
+      var p = procs.filter(function (x) { return x.pid === pid; })[0];
+      if (!p) return { ok: false, msg: 'No such process: ' + pid };
+      if (p.crit) return { ok: false, msg: 'Refused: ' + p.n + ' is a critical system process. Ending it would crash the operating system.' };
+      if (!USERS[u].root && p.owner !== u) return { ok: false, msg: 'Permission denied: only the owner (' + p.owner + ') or an administrator can end ' + p.n + '.' };
+      procs.splice(procs.indexOf(p), 1);
+      return { ok: true, msg: 'Ended ' + p.n + ' (PID ' + pid + '). Its CPU time and memory were returned to the system.' };
+    }
+    function tick() {
+      if (paused) return;
+      procs.forEach(function (p) {
+        var j = p.base * (0.6 + Math.random() * 0.8);
+        if (!p.crit && p.base < 60 && Math.random() < 0.06) j = p.base * 2;
+        p.cpu = Math.max(0.5, Math.round(j * 10) / 10);
+      });
+      var tot = 0; procs.forEach(function (p) { tot += p.cpu; });
+      if (tot > 100) { var f = 100 / tot; procs.forEach(function (p) { p.cpu = Math.round(p.cpu * f * 10) / 10; }); }
+      renderProcs();
+    }
+    function cpuTotal() { var t = 0; procs.forEach(function (p) { t += p.cpu; }); return Math.min(100, Math.round(t)); }
+    function renderProcs() {
+      var tot = cpuTotal();
+      document.getElementById('cpuTotal').textContent = tot + '%';
+      document.getElementById('cpuBar').style.width = tot + '%';
+      document.getElementById('procCount').textContent = procs.length;
+      document.getElementById('feel').textContent = tot < 60 ? 'Smooth' : tot < 90 ? 'Busy' : 'Very slow';
+      var h = '<thead><tr><th>PID</th><th>Name</th><th>Owner</th><th>CPU %</th><th>Memory</th><th>Action</th></tr></thead><tbody>';
+      procs.slice().sort(function (a, b) { return a.pid - b.pid; }).forEach(function (p) {
+        h += '<tr><td>' + p.pid + '</td><td>' + esc(p.n) + (p.crit ? ' (system)' : '') + '</td><td>' + p.owner + '</td><td>' + p.cpu.toFixed(1) + '</td><td>' + p.mem + ' MB</td><td><button class="btn sec sm" type="button" data-pid="' + p.pid + '">End</button></td></tr>';
+      });
+      document.getElementById('procTable').innerHTML = h + '</tbody>';
+    }
+    function initProcUI() {
+      var sel = document.getElementById('catalog');
+      sel.innerHTML = CATALOG.map(function (c, i) { return '<option value="' + i + '">' + c.n + '</option>'; }).join('');
+      document.getElementById('startProc').addEventListener('click', function () {
+        var c = CATALOG[Number(sel.value)];
+        if (!USERS[cur].root && cur === 'guest' && !c.g) { setMsg('procMsg', 'Restricted guests can only start approved apps (Web Browser, Text Editor).', 'bad'); return; }
+        var p = addProc(c.n, cur, c.c, c.m, false);
+        renderProcs();
+        setMsg('procMsg', 'Started ' + c.n + ' as ' + cur + ' with PID ' + p.pid + '. The OS gave it CPU time and memory.', 'ok');
+      });
+      document.getElementById('runaway').addEventListener('click', function () {
+        var p = addProc('Runaway Script', cur, 85, 350, false);
+        renderProcs();
+        setMsg('procMsg', 'A runaway process (PID ' + p.pid + ') is hogging the CPU. Notice how everything else gets less CPU time. End it to recover.', 'warn');
+      });
+      document.getElementById('pauseProc').addEventListener('click', function (e) {
+        paused = !paused;
+        e.target.textContent = paused ? 'Resume updates' : 'Pause updates';
+      });
+      document.getElementById('procTable').addEventListener('click', function (e) {
+        var pid = e.target.getAttribute && e.target.getAttribute('data-pid');
+        if (!pid) return;
+        var r = killProc(Number(pid), cur);
+        setMsg('procMsg', r.msg, r.ok ? 'ok' : 'bad');
+        renderProcs();
+      });
+      initProcs();
+      renderProcs();
+      setInterval(function () { if (!document.getElementById('sim-processes').hidden) tick(); }, 1000);
+    }
+
+    /* ===================== Memory ===================== */
+    var MN = 64, mem = [], mprogs = [], mid = 1;
+    var COLORS = ['#0b6bcb', '#7b61c9', '#d9822b', '#1e7a4c', '#b3372b', '#0f8b8d', '#a05195', '#8a6d00'];
+    function runs() {
+      var r = [], i = 0;
+      while (i < MN) {
+        if (mem[i] === 0) { var s = i; while (i < MN && mem[i] === 0) i++; r.push({ start: s, len: i - s }); } else i++;
+      }
+      return r;
+    }
+    function memAlloc(name, size, strat, sys) {
+      var r = runs().filter(function (x) { return x.len >= size; });
+      if (!r.length) {
+        var free = mem.filter(function (x) { return x === 0; }).length;
+        return { ok: false, free: free, size: size };
+      }
+      var pick = strat === 'best' ? r.sort(function (a, b) { return a.len - b.len; })[0] : r[0];
+      var id = mid++;
+      for (var i = pick.start; i < pick.start + size; i++) mem[i] = id;
+      mprogs.push({ id: id, name: name, size: size, sys: !!sys, color: sys ? '#555e6b' : COLORS[id % COLORS.length], start: pick.start });
+      return { ok: true, id: id, start: pick.start };
+    }
+    function memFree(id) {
+      for (var i = 0; i < MN; i++) if (mem[i] === id) mem[i] = 0;
+      mprogs = mprogs.filter(function (p) { return p.id !== id; });
+    }
+    function memInit(blank) {
+      mem = []; for (var i = 0; i < MN; i++) mem.push(0);
+      mprogs = []; mid = 1;
+      memAlloc('OS kernel', 8, 'first', true);
+      if (!blank) { memAlloc('Browser', 10, 'first'); memAlloc('Editor', 6, 'first'); memAlloc('Music', 4, 'first'); }
+    }
+    function renderMem() {
+      var g = '';
+      for (var i = 0; i < MN; i++) {
+        var p = mprogs.filter(function (x) { return x.id === mem[i]; })[0];
+        g += '<div class="cell" style="' + (p ? 'background:' + p.color : '') + '" title="Block ' + i + ': ' + (p ? esc(p.name) : 'free') + '">' + (p ? esc(p.name.charAt(0)) : '') + '</div>';
+      }
+      var grid = document.getElementById('memGrid');
+      grid.innerHTML = g;
+      var free = mem.filter(function (x) { return x === 0; }).length;
+      var largest = 0; runs().forEach(function (r) { if (r.len > largest) largest = r.len; });
+      document.getElementById('mUsed').textContent = Math.round((MN - free) / MN * 100) + '% (' + (MN - free) * 16 + ' MB)';
+      document.getElementById('mFree').textContent = free + ' (' + free * 16 + ' MB)';
+      document.getElementById('mLargest').textContent = largest + ' blocks';
+      var t = '<thead><tr><th>Program</th><th>Blocks</th><th>Size</th><th>Action</th></tr></thead><tbody>';
+      mprogs.forEach(function (p) {
+        t += '<tr><td><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:' + p.color + ';margin-right:6px"></span>' + esc(p.name) + '</td><td>' + p.size + '</td><td>' + p.size * 16 + ' MB</td><td>' + (p.sys ? 'Protected' : '<button class="btn sec sm" type="button" data-mid="' + p.id + '">Free</button>') + '</td></tr>';
+      });
+      document.getElementById('memTable').innerHTML = t + '</tbody>';
+    }
+    function memFreeCount() { return mem.filter(function (x) { return x === 0; }).length; }
+    function initMemUI() {
+      memInit(false);
+      document.getElementById('mAlloc').addEventListener('click', function () {
+        var name = document.getElementById('mName').value.trim() || 'Program';
+        var size = Math.max(1, Math.min(32, parseInt(document.getElementById('mSize').value, 10) || 1));
+        var r = memAlloc(name, size, document.getElementById('mStrat').value, false);
+        if (r.ok) setMsg('memMsg', 'Allocated ' + size + ' blocks to "' + name + '" starting at block ' + r.start + '.', 'ok');
+        else if (r.free >= size) setMsg('memMsg', 'External fragmentation: ' + r.free + ' blocks are free in total, but no single gap is ' + size + ' blocks long. Try "Compact memory".', 'bad');
+        else setMsg('memMsg', 'Out of memory: only ' + r.free + ' blocks are free. Free a program first. (A real OS might use virtual memory and move data to disk.)', 'bad');
+        renderMem();
+      });
+      document.getElementById('memTable').addEventListener('click', function (e) {
+        var id = e.target.getAttribute && e.target.getAttribute('data-mid');
+        if (!id) return;
+        memFree(Number(id));
+        setMsg('memMsg', 'Memory freed. The blocks are available again, but the gap may be small.', 'ok');
+        renderMem();
+      });
+      document.getElementById('mCompact').addEventListener('click', function () {
+        var order = mprogs.slice().sort(function (a, b) { return mem.indexOf(a.id) - mem.indexOf(b.id); });
+        var pos = 0, old = mem.slice();
+        for (var i = 0; i < MN; i++) mem[i] = 0;
+        order.forEach(function (p) { for (var k = 0; k < p.size; k++) mem[pos + k] = p.id; pos += p.size; });
+        setMsg('memMsg', 'Compaction moved every program together, merging the free gaps into one large block.', 'ok');
+        renderMem();
+      });
+      document.getElementById('mDemo').addEventListener('click', function () {
+        memInit(true);
+        var ids = ['A', 'B', 'C', 'D', 'E', 'F'].map(function (n, i) { return memAlloc('Prog ' + n, i % 2 === 0 ? 6 : 8, 'first').id; });
+        memFree(ids[1]); memFree(ids[3]);
+        setMsg('memMsg', 'Prog B and Prog D were closed, leaving two small gaps. Now allocate 20 blocks: there is enough free memory in total, but not in one piece.', 'warn');
+        document.getElementById('mSize').value = 20;
+        renderMem();
+      });
+      document.getElementById('mReset').addEventListener('click', function () { memInit(false); setMsg('memMsg', 'Memory reset.'); renderMem(); });
+      renderMem();
+    }
+
+    /* ===================== File system ===================== */
+    var root;
+    function mk(name, type, owner, group, mode, content) {
+      var n = { name: name, type: type, owner: owner, group: group, mode: mode };
+      if (type === 'dir') n.kids = []; else n.content = content || '';
+      return n;
+    }
+    function add(parent, node) { parent.kids.push(node); return node; }
+    function buildFS() {
+      root = mk('', 'dir', 'admin', 'admin', 'rwxr-xr-x');
+      var docs = add(root, mk('Documents', 'dir', 'sam', 'users', 'rwxr-x---'));
+      add(docs, mk('report.docx', 'file', 'sam', 'users', 'rw-r-----', 'Quarterly report draft. Sales grew 12 percent.'));
+      add(docs, mk('notes.txt', 'file', 'sam', 'users', 'rw-------', 'Private notes: remember to update the laptop.'));
+      var pics = add(root, mk('Pictures', 'dir', 'sam', 'users', 'rwxr-xr-x'));
+      add(pics, mk('cat.png', 'file', 'sam', 'users', 'rw-r--r--', '[image data: a photo of a cat]'));
+      var pub = add(root, mk('Public', 'dir', 'admin', 'users', 'rwxr-xr-x'));
+      add(pub, mk('welcome.txt', 'file', 'admin', 'users', 'rw-r--r--', 'Welcome to the simulated OS! Everyone can read this file.'));
+      var sys = add(root, mk('System', 'dir', 'admin', 'admin', 'rwxr-xr-x'));
+      add(sys, mk('config.sys', 'file', 'admin', 'admin', 'rw-r--r--', 'boot=safe\nnetwork=on\nfirewall=enabled'));
+      add(sys, mk('kernel.bin', 'file', 'admin', 'admin', 'rwx------', '[binary data: the OS kernel]'));
+    }
+    function can(n, u, b) {
+      var U = USERS[u];
+      if (U.root) return true;
+      var off = n.owner === u ? 0 : (U.groups.indexOf(n.group) > -1 ? 3 : 6);
+      return n.mode.charAt(off + 'rwx'.indexOf(b)) === b;
+    }
+    function pathStr(chain) { return '/' + chain.slice(1).map(function (n) { return n.name; }).join('/'); }
+    function kidsSorted(d) { return d.kids.slice().sort(function (a, b) { return (a.type === b.type ? 0 : a.type === 'dir' ? -1 : 1) || a.name.localeCompare(b.name); }); }
+    function newNode(type, name, dirChain) {
+      var d = dirChain[dirChain.length - 1];
+      if (!/^[A-Za-z0-9._-]{1,24}$/.test(name)) return 'Use 1 to 24 letters, numbers, dots, dashes, or underscores.';
+      if (!can(d, cur, 'w')) return 'Permission denied: ' + cur + ' cannot write in ' + pathStr(dirChain) + '.';
+      if (d.kids.some(function (k) { return k.name === name; })) return 'A file or folder named "' + name + '" already exists.';
+      add(d, type === 'dir' ? mk(name, 'dir', cur, USERS[cur].groups[0], 'rwxr-xr-x') : mk(name, 'file', cur, USERS[cur].groups[0], 'rw-r--r--', 'New empty file.'));
+      return null;
+    }
+    function modeFromDigits(s) {
+      var out = '';
+      for (var i = 0; i < 3; i++) { var d = Number(s.charAt(i)); out += (d & 4 ? 'r' : '-') + (d & 2 ? 'w' : '-') + (d & 1 ? 'x' : '-'); }
+      return out;
+    }
+
+    var ex = { chain: [], sel: null, view: null };
+    function exFixAccess() {
+      // After a user switch, step back out of folders the new user cannot enter.
+      var keep = [root];
+      for (var i = 1; i < ex.chain.length; i++) {
+        var parent = keep[keep.length - 1];
+        if (can(parent, cur, 'x') && can(ex.chain[i], cur, 'x') && can(ex.chain[i], cur, 'r')) keep.push(ex.chain[i]); else break;
+      }
+      ex.chain = keep; ex.sel = null; ex.view = null;
+    }
+    function renderEx() {
+      var dir = ex.chain[ex.chain.length - 1];
+      document.getElementById('exPath').textContent = pathStr(ex.chain);
+      var h = '<thead><tr><th>Name</th><th>Type</th><th>Owner</th><th>Permissions</th><th>Actions</th></tr></thead><tbody>';
+      if (!can(dir, cur, 'r')) h += '<tr><td colspan="5">Permission denied: you cannot list this folder.</td></tr>';
+      else kidsSorted(dir).forEach(function (k, i) {
+        var idx = dir.kids.indexOf(k);
+        h += '<tr' + (ex.sel === k ? ' class="hl"' : '') + '><td>' + (k.type === 'dir' ? '[Folder] ' : '[File] ') + esc(k.name) + '</td><td>' + (k.type === 'dir' ? 'Folder' : 'File') + '</td><td>' + k.owner + '</td><td><code>' + (k.type === 'dir' ? 'd' : '-') + k.mode + '</code></td><td>' +
+          '<button class="btn sec sm" type="button" data-a="open" data-i="' + idx + '">' + (k.type === 'dir' ? 'Open' : 'Read') + '</button>' +
+          '<button class="btn sec sm" type="button" data-a="perm" data-i="' + idx + '">Permissions</button>' +
+          '<button class="btn sec sm" type="button" data-a="del" data-i="' + idx + '">Delete</button></td></tr>';
+      });
+      if (can(dir, cur, 'r') && !dir.kids.length) h += '<tr><td colspan="5">This folder is empty.</td></tr>';
+      document.getElementById('exTable').innerHTML = h + '</tbody>';
+      var d = '';
+      if (ex.sel) {
+        var editable = USERS[cur].root || ex.sel.owner === cur;
+        d += '<h3 style="margin-top:14px">Permissions for ' + esc(ex.sel.name) + '</h3><p class="small">Owner: ' + ex.sel.owner + ', group: ' + ex.sel.group + '. ' + (editable ? 'You can change these.' : 'Only the owner or an administrator can change these.') + '</p><div class="perm-boxes"><span></span><strong>Read</strong><strong>Write</strong><strong>Execute</strong>';
+        ['Owner', 'Group', 'Others'].forEach(function (who, g) {
+          d += '<strong>' + who + '</strong>';
+          for (var b = 0; b < 3; b++) d += '<input type="checkbox" data-bit="' + (g * 3 + b) + '" aria-label="' + who + ' ' + ['read', 'write', 'execute'][b] + '"' + (ex.sel.mode.charAt(g * 3 + b) !== '-' ? ' checked' : '') + (editable ? '' : ' disabled') + '>';
+        });
+        d += '</div>';
+      }
+      if (ex.view) d += '<pre class="view">' + esc(ex.view) + '</pre>';
+      document.getElementById('exDetail').innerHTML = d;
+    }
+    function initFilesUI() {
+      buildFS(); ex.chain = [root];
+      document.getElementById('exTable').addEventListener('click', function (e) {
+        var a = e.target.getAttribute && e.target.getAttribute('data-a');
+        if (!a) return;
+        var dir = ex.chain[ex.chain.length - 1], k = dir.kids[Number(e.target.getAttribute('data-i'))];
+        if (!k) return;
+        if (a === 'open') {
+          if (k.type === 'dir') {
+            if (!can(k, cur, 'x') || !can(k, cur, 'r')) { setMsg('exMsg', 'Permission denied: ' + cur + ' cannot open the folder "' + k.name + '" (permissions ' + k.mode + ').', 'bad'); return; }
+            ex.chain.push(k); ex.sel = null; ex.view = null; setMsg('exMsg', 'Opened ' + pathStr(ex.chain) + '.', 'ok');
+          } else if (can(k, cur, 'r')) { ex.view = k.content; ex.sel = k; setMsg('exMsg', 'Read ' + k.name + ' successfully.', 'ok'); }
+          else { ex.view = null; setMsg('exMsg', 'Permission denied: ' + cur + ' does not have read permission for "' + k.name + '" (permissions ' + k.mode + ').', 'bad'); }
+        } else if (a === 'perm') { ex.sel = k; ex.view = null; setMsg('exMsg', 'Showing permissions for ' + k.name + '.'); }
+        else if (a === 'del') {
+          if (!can(dir, cur, 'w')) setMsg('exMsg', 'Permission denied: deleting needs write permission on the folder ' + pathStr(ex.chain) + '.', 'bad');
+          else {
+            dir.kids.splice(dir.kids.indexOf(k), 1); if (ex.sel === k) ex.sel = null; ex.view = null;
+            setMsg('exMsg', 'Deleted ' + k.name + '.' + (k.name === 'kernel.bin' ? ' In a real OS, deleting the kernel would stop it from booting!' : ''), k.name === 'kernel.bin' ? 'warn' : 'ok');
+          }
+        }
+        renderEx();
+      });
+      document.getElementById('exDetail').addEventListener('change', function (e) {
+        var bit = e.target.getAttribute && e.target.getAttribute('data-bit');
+        if (bit === null || bit === undefined || !ex.sel) return;
+        var i = Number(bit), m = ex.sel.mode.split('');
+        m[i] = e.target.checked ? 'rwx'.charAt(i % 3) : '-';
+        ex.sel.mode = m.join('');
+        setMsg('exMsg', 'Permissions of ' + ex.sel.name + ' are now ' + ex.sel.mode + ' (' + ['owner', 'group', 'others'].map(function (w, g) { return w + ' ' + ex.sel.mode.substr(g * 3, 3); }).join(', ') + ').', 'ok');
+        renderEx();
+      });
+      document.getElementById('exUp').addEventListener('click', function () { if (ex.chain.length > 1) ex.chain.pop(); ex.sel = null; ex.view = null; renderEx(); });
+      document.getElementById('exReset').addEventListener('click', function () { buildFS(); ex.chain = [root]; ex.sel = null; ex.view = null; term.cwd = [root]; setMsg('exMsg', 'Files reset.'); renderEx(); termPrompt(); });
+      function create(type) {
+        var el = document.getElementById('newName');
+        var err = newNode(type, el.value.trim(), ex.chain);
+        if (err) setMsg('exMsg', err, 'bad'); else { setMsg('exMsg', 'Created ' + el.value.trim() + '.', 'ok'); el.value = ''; }
+        renderEx();
+      }
+      document.getElementById('newFolder').addEventListener('click', function () { create('dir'); });
+      document.getElementById('newFile').addEventListener('click', function () { create('file'); });
+      userHooks.push(function () { exFixAccess(); renderEx(); });
+      renderEx();
+    }
+
+    /* ===================== User permissions demo ===================== */
+    var ACTIONS = [
+      { l: 'Run everyday apps', r: { admin: 'A', sam: 'A', guest: 'A' }, w: 'Everyone can run approved programs. Guests are limited to a short approved list.' },
+      { l: 'Save files in your own folder', r: { admin: 'A', sam: 'A', guest: 'D' }, w: 'Guest sessions have no personal storage, so nothing can be saved there.' },
+      { l: 'Change your own password', r: { admin: 'A', sam: 'A', guest: 'D' }, w: 'Guests share one temporary account, so they cannot change its password.' },
+      { l: 'Install software for all users', r: { admin: 'A', sam: 'P', guest: 'D' }, w: 'Software that affects everyone can contain malware, so the OS asks for administrator approval first.' },
+      { l: 'Change system settings (firewall, network)', r: { admin: 'A', sam: 'P', guest: 'D' }, w: 'These settings protect the whole computer, so changing them needs elevated rights.' },
+      { l: 'Create or delete user accounts', r: { admin: 'A', sam: 'D', guest: 'D' }, w: 'Only administrators manage who can use the computer.' },
+      { l: 'Read another user\'s private files', r: { admin: 'A', sam: 'D', guest: 'D' }, w: 'File permissions keep each user\'s data private. Administrators can override this, which is why admin accounts must be protected.' },
+      { l: 'Delete protected system files', r: { admin: 'A', sam: 'D', guest: 'D' }, w: 'Deleting system files can stop the OS from starting, so only administrators can, and they should rarely do it.' }
+    ];
+    var PLABEL = { A: 'Allowed', P: 'Needs admin password', D: 'Denied' };
+    function renderPerms() {
+      var h = '<thead><tr><th>Action</th>';
+      ['admin', 'sam', 'guest'].forEach(function (u) { h += '<th' + (u === cur ? ' class="hl"' : '') + '>' + USERS[u].label + '</th>'; });
+      h += '<th>Try</th></tr></thead><tbody>';
+      ACTIONS.forEach(function (a, i) {
+        h += '<tr><td>' + esc(a.l) + '</td>';
+        ['admin', 'sam', 'guest'].forEach(function (u) { h += '<td' + (u === cur ? ' class="hl"' : '') + '>' + PLABEL[a.r[u]] + '</td>'; });
+        h += '<td><button class="btn sec sm" type="button" data-act="' + i + '">Try it</button></td></tr>';
+      });
+      document.getElementById('permTable').innerHTML = h + '</tbody>';
+    }
+    function initPermsUI() {
+      document.getElementById('permTable').addEventListener('click', function (e) {
+        var i = e.target.getAttribute && e.target.getAttribute('data-act');
+        if (i === null || i === undefined) return;
+        var a = ACTIONS[Number(i)], s = a.r[cur], box = document.getElementById('permMsg');
+        var who = USERS[cur].label + ' (' + cur + ')';
+        if (s === 'A') setMsg('permMsg', who + ' tried "' + a.l + '": ALLOWED. ' + a.w, 'ok');
+        else if (s === 'D') setMsg('permMsg', who + ' tried "' + a.l + '": DENIED. ' + a.w, 'bad');
+        else {
+          setMsg('permMsg', who + ' tried "' + a.l + '": the OS asks for an administrator password. Windows shows a UAC prompt, macOS shows a password dialog, and Linux uses sudo. ' + a.w, 'warn');
+          var b = document.createElement('button');
+          b.type = 'button'; b.className = 'btn sm'; b.style.marginLeft = '8px'; b.textContent = 'Approve as administrator';
+          b.addEventListener('click', function () { setMsg('permMsg', 'Approved with temporary administrator rights. "' + a.l + '" completed, and the extra rights were dropped afterwards.', 'ok'); });
+          box.appendChild(b);
+        }
+      });
+      userHooks.push(function () { renderPerms(); setMsg('permMsg', 'Now acting as ' + USERS[cur].label + '. Click "Try it" on an action.'); });
+      renderPerms();
+    }
+
+    /* ===================== Security quiz ===================== */
+    var QZ = [
+      { q: 'Why should you install operating system updates promptly?', o: ['They make the desktop look different', 'They fix security holes attackers could use', 'They delete old files', 'They make the battery last longer'], a: 1, e: 'Updates patch known vulnerabilities. Many attacks target flaws that already have a fix.' },
+      { q: 'You get an email with an unexpected attachment named invoice.exe. What should you do?', o: ['Open it to see what it is', 'Forward it to friends', 'Delete it without opening, or report it', 'Rename it and open it'], a: 2, e: 'Unexpected executable attachments are a classic way to spread malware.' },
+      { q: 'Which is the strongest account protection?', o: ['A short password you can remember', 'The same password everywhere', 'A long unique password plus multi-factor authentication', 'Your birthday'], a: 2, e: 'Long, unique passwords stop guessing and reuse attacks, and a second factor blocks most stolen-password logins.' },
+      { q: 'What does the principle of least privilege suggest for daily use?', o: ['Always work as administrator', 'Use a standard account and elevate only when needed', 'Share one account with everyone', 'Turn off permissions'], a: 1, e: 'A standard account limits the damage if malware runs under your account.' },
+      { q: 'Malware that locks your files and demands payment is called:', o: ['Spyware', 'Adware', 'Ransomware', 'A firewall'], a: 2, e: 'Ransomware encrypts files and demands a ransom. Offline backups are the best protection.' },
+      { q: 'A message says "Your account is locked! Click here and enter your password now." This is most likely:', o: ['A normal system message', 'A phishing attempt', 'A software update', 'A file permission error'], a: 1, e: 'Urgency and links asking for passwords are phishing warning signs. Go to the official site yourself instead.' },
+      { q: 'A permission or admin prompt suddenly appears right after you opened a random download. What should you do?', o: ['Click Allow quickly', 'Deny it and scan the download', 'Restart and click Allow', 'Ignore the computer for a day'], a: 1, e: 'Unexpected elevation prompts mean something is trying to change your system. Deny them.' },
+      { q: 'What best protects you from losing files to ransomware or a failed drive?', o: ['A bigger monitor', 'Regular backups, including one stored offline', 'A louder fan', 'Deleting old files'], a: 1, e: 'Backups let you restore your data. An offline copy cannot be encrypted by malware on your computer.' }
+    ];
+    var qi = 0, qScore = 0, qDone = false;
+    function showQ() {
+      var q = QZ[qi];
+      document.getElementById('qProgress').textContent = 'Question ' + (qi + 1) + ' of ' + QZ.length + ' | Score: ' + qScore;
+      document.getElementById('qText').textContent = q.q;
+      var box = document.getElementById('qOpts'); box.innerHTML = '';
+      document.getElementById('qFeedback').hidden = true;
+      document.getElementById('qNext').hidden = true;
+      q.o.forEach(function (t, i) {
+        var b = document.createElement('button');
+        b.type = 'button'; b.className = 'opt'; b.textContent = t;
+        b.addEventListener('click', function () {
+          if (qDone) return; qDone = true;
+          var all = box.querySelectorAll('.opt'); all.forEach(function (x) { x.disabled = true; });
+          all[q.a].className = 'opt right';
+          var f = document.getElementById('qFeedback');
+          if (i === q.a) { qScore++; f.className = 'msg ok'; f.textContent = 'Correct. ' + q.e; }
+          else { b.className = 'opt wrong'; f.className = 'msg bad'; f.textContent = 'Not quite. ' + q.e; }
+          f.hidden = false;
+          var nx = document.getElementById('qNext'); nx.textContent = qi + 1 < QZ.length ? 'Next' : 'See my score'; nx.hidden = false;
+          document.getElementById('qProgress').textContent = 'Question ' + (qi + 1) + ' of ' + QZ.length + ' | Score: ' + qScore;
+        });
+        box.appendChild(b);
+      });
+      qDone = false;
+    }
+    function initQuiz() {
+      document.getElementById('qNext').addEventListener('click', function () {
+        if (qi >= QZ.length) { qi = 0; qScore = 0; showQ(); return; }
+        qi++;
+        if (qi < QZ.length) { showQ(); return; }
+        document.getElementById('qProgress').textContent = 'Finished';
+        document.getElementById('qText').textContent = 'You scored ' + qScore + ' out of ' + QZ.length + '.';
+        document.getElementById('qOpts').innerHTML = '';
+        var f = document.getElementById('qFeedback'); f.hidden = false; f.className = 'msg';
+        f.textContent = qScore >= 7 ? 'Excellent security habits!' : qScore >= 5 ? 'Good job. Review the explanations you missed.' : 'Keep practicing: updates, strong passwords, and caution with unknown files go a long way.';
+        document.getElementById('qNext').textContent = 'Restart quiz';
+      });
+      showQ();
+    }
+
+    /* ===================== Terminal ===================== */
+    var term = { cwd: [], hist: [], hi: 0 };
+    function tOut(text, cls) {
+      var d = document.createElement('div');
+      if (cls) d.className = cls;
+      d.textContent = text;
+      document.getElementById('termOut').appendChild(d);
+      var t = document.getElementById('term'); t.scrollTop = t.scrollHeight;
+    }
+    function termPrompt() { document.getElementById('termPrompt').textContent = cur + '@os-sim:' + pathStr(term.cwd) + '$'; }
+    function resolvePath(str, base) {
+      var chain = str.charAt(0) === '/' ? [root] : base.slice();
+      var parts = str.split('/').filter(Boolean);
+      for (var i = 0; i < parts.length; i++) {
+        var p = parts[i];
+        if (p === '.') continue;
+        if (p === '..') { if (chain.length > 1) chain.pop(); continue; }
+        var d = chain[chain.length - 1];
+        if (d.type !== 'dir') return { err: 'Not a directory: ' + d.name };
+        if (!can(d, cur, 'x')) return { err: 'Permission denied: cannot enter ' + pathStr(chain) };
+        var k = d.kids.filter(function (x) { return x.name === p; })[0];
+        if (!k) return { err: 'No such file or directory: ' + str };
+        chain.push(k);
+      }
+      return { chain: chain };
+    }
+    function pad(s, n) { s = String(s); while (s.length < n) s += ' '; return s; }
+    function execCmd(parts, line) {
+      var c = parts[0], a = parts.slice(1);
+      var dir = term.cwd[term.cwd.length - 1];
+      if (c === 'help') {
+        tOut('Commands: help, pwd, ls [-l] [path], cd <path>, cat <file>, mkdir <name>, touch <name>, rm [-r] <name>,\nchmod <ddd> <name>, whoami, su <admin|sam|guest>, sudo <command>, ps, kill <pid>, free, echo <text>,\ndate, uname, history, clear');
+      } else if (c === 'pwd') tOut(pathStr(term.cwd));
+      else if (c === 'whoami') tOut(cur);
+      else if (c === 'echo') tOut(a.join(' '));
+      else if (c === 'date') tOut(new Date().toString());
+      else if (c === 'uname') tOut('OS-Sim 1.0 (a safe browser simulation)');
+      else if (c === 'clear') document.getElementById('termOut').innerHTML = '';
+      else if (c === 'history') term.hist.forEach(function (h, i) { tOut((i + 1) + '  ' + h); });
+      else if (c === 'ls') {
+        var long = a.indexOf('-l') > -1, target = a.filter(function (x) { return x.charAt(0) !== '-'; })[0];
+        var chain = term.cwd;
+        if (target) { var r = resolvePath(target, term.cwd); if (r.err) { tOut(r.err, 'err'); return; } chain = r.chain; }
+        var d = chain[chain.length - 1];
+        if (d.type !== 'dir') { tOut(d.name); return; }
+        if (!can(d, cur, 'r')) { tOut('ls: Permission denied: ' + pathStr(chain), 'err'); return; }
+        if (!d.kids.length) { tOut('(empty)'); return; }
+        kidsSorted(d).forEach(function (k) { tOut(long ? (k.type === 'dir' ? 'd' : '-') + k.mode + '  ' + pad(k.owner, 6) + pad(k.group, 7) + k.name + (k.type === 'dir' ? '/' : '') : k.name + (k.type === 'dir' ? '/' : '')); });
+      } else if (c === 'cd') {
+        var r2 = resolvePath(a[0] || '/', term.cwd);
+        if (r2.err) { tOut('cd: ' + r2.err, 'err'); return; }
+        var last = r2.chain[r2.chain.length - 1];
+        if (last.type !== 'dir') { tOut('cd: not a directory: ' + a[0], 'err'); return; }
+        if (!can(last, cur, 'x')) { tOut('cd: Permission denied: ' + a[0], 'err'); return; }
+        term.cwd = r2.chain;
+      } else if (c === 'cat') {
+        if (!a[0]) { tOut('Usage: cat <file>', 'err'); return; }
+        var r3 = resolvePath(a[0], term.cwd);
+        if (r3.err) { tOut('cat: ' + r3.err, 'err'); return; }
+        var f = r3.chain[r3.chain.length - 1];
+        if (f.type === 'dir') tOut('cat: ' + a[0] + ': Is a directory', 'err');
+        else if (!can(f, cur, 'r')) tOut('cat: ' + a[0] + ': Permission denied', 'err');
+        else tOut(f.content);
+      } else if (c === 'mkdir' || c === 'touch') {
+        if (!a[0]) { tOut('Usage: ' + c + ' <name>', 'err'); return; }
+        var err = newNode(c === 'mkdir' ? 'dir' : 'file', a[0], term.cwd);
+        if (err) tOut(c + ': ' + err, 'err');
+      } else if (c === 'rm') {
+        var rec = a.indexOf('-r') > -1, nm = a.filter(function (x) { return x.charAt(0) !== '-'; })[0];
+        if (!nm) { tOut('Usage: rm [-r] <name>', 'err'); return; }
+        var k = dir.kids.filter(function (x) { return x.name === nm; })[0];
+        if (!k) tOut('rm: cannot remove "' + nm + '": No such file or directory', 'err');
+        else if (!can(dir, cur, 'w')) tOut('rm: cannot remove "' + nm + '": Permission denied', 'err');
+        else if (k.type === 'dir' && !rec) tOut('rm: cannot remove "' + nm + '": Is a directory (use rm -r)', 'err');
+        else dir.kids.splice(dir.kids.indexOf(k), 1);
+      } else if (c === 'chmod') {
+        if (!/^[0-7]{3}$/.test(a[0] || '') || !a[1]) { tOut('Usage: chmod <three digits, e.g. 644> <name>', 'err'); return; }
+        var t = dir.kids.filter(function (x) { return x.name === a[1]; })[0];
+        if (!t) tOut('chmod: cannot access "' + a[1] + '": No such file or directory', 'err');
+        else if (!USERS[cur].root && t.owner !== cur) tOut('chmod: changing permissions of "' + a[1] + '": Operation not permitted', 'err');
+        else { t.mode = modeFromDigits(a[0]); tOut('mode of "' + a[1] + '" changed to ' + a[0] + ' (' + t.mode + ')'); }
+      } else if (c === 'su') {
+        if (!a[0] || !USERS[a[0]]) { tOut('Usage: su <admin|sam|guest>', 'err'); return; }
+        setUser(a[0]); tOut('Switched to ' + a[0] + ' (' + USERS[a[0]].label + ').');
+      } else if (c === 'ps') {
+        tOut(pad('PID', 7) + pad('USER', 8) + pad('CPU%', 7) + pad('MEM', 9) + 'COMMAND');
+        procs.forEach(function (p) { tOut(pad(p.pid, 7) + pad(p.owner, 8) + pad(p.cpu.toFixed(1), 7) + pad(p.mem + 'MB', 9) + p.n); });
+      } else if (c === 'kill') {
+        if (!/^\d+$/.test(a[0] || '')) { tOut('Usage: kill <pid>  (use ps to find it)', 'err'); return; }
+        var kr = killProc(Number(a[0]), cur); tOut(kr.msg, kr.ok ? '' : 'err'); renderProcs();
+      } else if (c === 'free') {
+        var fr = memFreeCount();
+        tOut(pad('', 8) + pad('total', 9) + pad('used', 9) + 'free');
+        tOut(pad('Mem:', 8) + pad(MN * 16 + 'MB', 9) + pad((MN - fr) * 16 + 'MB', 9) + fr * 16 + 'MB');
+      } else tOut('command not found: ' + c + '. Type "help" for a list of commands.', 'err');
+    }
+    function runLine(line) {
+      tOut(cur + '@os-sim:' + pathStr(term.cwd) + '$ ' + line, 'in');
+      line = line.trim();
+      if (!line) return;
+      term.hist.push(line); term.hi = term.hist.length;
+      if (/rm\s+-[a-z]*r[a-z]*f?\s+\/(\s|$)/.test(line) || /rm\s+-[a-z]*f[a-z]*r?\s+\/(\s|$)/.test(line)) {
+        tOut('This is a safe simulation, so nothing was deleted. In a real OS, this command could destroy the whole system. Never run it.', 'err');
+        return;
+      }
+      var parts = line.split(/\s+/);
+      if (parts[0] === 'sudo') {
+        if (cur === 'guest') { tOut('guest is not in the sudoers file. This incident would be reported.', 'err'); return; }
+        if (parts.length < 2) { tOut('Usage: sudo <command>', 'err'); return; }
+        var saved = cur; cur = 'admin';
+        try { execCmd(parts.slice(1), line); } finally { cur = saved; }
+        return;
+      }
+      execCmd(parts, line);
+    }
+    function initTerminal() {
+      term.cwd = [root];
+      tOut('OS-Sim terminal. This is a safe simulation: nothing here affects your real computer.');
+      tOut('Type "help" to see the commands. Try: ls -l, cat Documents/report.docx, ps, kill 530, su guest');
+      termPrompt();
+      var inp = document.getElementById('termIn');
+      inp.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') { var v = inp.value; inp.value = ''; runLine(v); termPrompt(); renderEx(); }
+        else if (e.key === 'ArrowUp') { if (term.hi > 0) { term.hi--; inp.value = term.hist[term.hi] || ''; } e.preventDefault(); }
+        else if (e.key === 'ArrowDown') { if (term.hi < term.hist.length) { term.hi++; inp.value = term.hist[term.hi] || ''; } e.preventDefault(); }
+      });
+      document.getElementById('term').addEventListener('click', function () { inp.focus(); });
+      userHooks.push(function () { term.cwd = [root]; termPrompt(); });
+    }
+
+    /* ===================== Tabs and start-up ===================== */
+    function showTab(tab) {
+      document.querySelectorAll('#simTabs .tab').forEach(function (t) {
+        var on = t === tab;
+        t.setAttribute('aria-selected', on ? 'true' : 'false');
+        document.getElementById(t.getAttribute('aria-controls')).hidden = !on;
+      });
+      if (tab.id === 'tab-terminal') document.getElementById('termIn').focus();
+      if (tab.id === 'tab-processes') renderProcs();
+    }
+    document.querySelectorAll('#simTabs .tab').forEach(function (t) { t.addEventListener('click', function () { showTab(t); }); });
+
+    ['admin', 'sam', 'guest'].forEach(function (u) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'chip'; b.setAttribute('data-u', u);
+      b.textContent = USERS[u].label + ' (' + u + ')';
+      b.addEventListener('click', function () { setUser(u); });
+      document.getElementById('userBtns').appendChild(b);
+    });
+
+    initProcUI();
+    initMemUI();
+    initFilesUI();
+    initPermsUI();
+    initQuiz();
+    initTerminal();
+    setUser('sam');
+
+    (function () {
+      var p = {};
+      location.hash.replace(/^#/, '').split('&').forEach(function (s) { var kv = s.split('='); if (kv[0]) p[kv[0]] = decodeURIComponent(kv[1] || ''); });
+      if (p.tab) { var tb = document.getElementById('tab-' + p.tab); if (tb) showTab(tb); }
+      if (p.user && USERS[p.user]) setUser(p.user);
+    })();
+  </script>
+</body>
+</html>

@@ -34,6 +34,7 @@
         <a href="compare.html">Compare</a>
         <a href="assistant.html" aria-current="page">Assistant</a>
         <a href="advisor.html">Advisor</a>
+        <a href="simulations.html">Simulations</a>
       </nav>
     </div>
   </header>
@@ -280,6 +281,13 @@
         autoOpen('the chmod calculator set to ' + code, 'linux.html#section=permissions&chmod=' + code);
         return true;
       }
+
+      // simulations page
+      var SIMS = [['processes', /process manager|process sim|processes simulation|task manager sim/], ['memory', /memory (sim|alloc|manag)/], ['files', /file (system|explorer) sim|simulated file/], ['perms', /permissions? (demo|sim)|user permissions/], ['quiz', /security quiz/], ['terminal', /terminal sim|simulated terminal|practice terminal|terminal practice/]];
+      for (var si = 0; si < SIMS.length; si++) {
+        if (SIMS[si][1].test(t)) { autoOpen('the ' + SIMS[si][0] + ' simulation', 'simulations.html#tab=' + SIMS[si][0]); return true; }
+      }
+      if (/simulat/.test(t)) { autoOpen('the simulations page', 'simulations.html'); return true; }
 
       // quiz
       if (/quiz/.test(t)) {
